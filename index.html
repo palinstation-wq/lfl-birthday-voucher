@@ -10,6 +10,7 @@
 <style>
 :root{--bg:#FFF5E8;--circle:#FBE2D2;--text:#2B1B1B;--muted:#6E5C5C;--head:#D9192B;--script:#B8892E;--accent:#8A6A22;--pill:#D4A63E;--pillText:#2B1B1B;--btn:#D9192B;--btnText:#fff;--box:#D9192B;--lid:#B3121F;--ribbon:#D4A63E;--ribbonDark:#8A6A22;--card:#fff;--cardText:#2B1B1B;--cardMuted:#6E5C5C;--num:#D9192B;--dash:#E3CDB4}
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html,body{margin:0;min-height:100%}
 body{font-family:'IBM Plex Sans Thai',sans-serif;background:var(--bg);color:var(--text);-webkit-tap-highlight-color:transparent}
 button{font-family:inherit;cursor:pointer}
@@ -239,7 +240,9 @@ S.staff = S.staff || {};
 S.log = S.log || [];
 S.pins = S.pins || {};
 S.tries = S.tries || {};
-SEATS.forEach(s => { if (!S.pins[s.key]) S.pins[s.key] = String(1000 + Math.floor(Math.random() * 9000)); });
+S.extraSeats = S.extraSeats || [];
+const allSeats = () => SEATS.concat(S.extraSeats);
+allSeats().forEach(s => { if (!S.pins[s.key]) S.pins[s.key] = String(1000 + Math.floor(Math.random() * 9000)); });
 
 const p = $('อ่านคำขอ').first().json.p || {};
 const v = $json || {};
@@ -256,7 +259,8 @@ const th = (iso) => { if (!iso) return '-'; const d = new Date(iso); return d.to
 const thDate = (iso) => { if (!iso) return '-'; const d = new Date(iso.length === 10 ? iso + 'T00:00:00+07:00' : iso); return d.toLocaleDateString('th-TH', { timeZone: 'Asia/Bangkok', day: 'numeric', month: 'short', year: 'numeric' }); };
 const baht = (n) => Number(n).toLocaleString('en-US');
 const rand = (n, set = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789') => Array.from({ length: n }, () => set[Math.floor(Math.random() * set.length)]).join('');
-const staffOf = (id) => S.staff[id] && S.staff[id].status === 'approved' ? S.staff[id] : null;
+const seatOk = (k) => { const s = allSeats().find(x => x.key === k); return !!s && (!s.until || new Date(s.until) >= now); };
+const staffOf = (id) => S.staff[id] && S.staff[id].status === 'approved' && seatOk(S.staff[id].seat) ? S.staff[id] : null;
 const roleOf = (id) => id === OWNER ? 'owner' : (staffOf(id) ? staffOf(id).role : null);
 const myRole = roleOf(me.id);
 const log = (what, code) => { S.log.unshift({ at: nowIso, by: me.id, byName: (staffOf(me.id) || {}).name || me.name, role: myRole || 'คนนอก', what, code: code || '' }); S.log = S.log.slice(0, 300); };
@@ -309,7 +313,7 @@ if (a === 'me') {
 
 if (a === 'bind') {
   if (S.staff[me.id]) return done({ ok: true, staff: S.staff[me.id] });
-  const seat = SEATS.find(x => x.key === p.seat);
+  const seat = allSeats().find(x => x.key === p.seat && seatOk(x.key));
   if (!seat) return fail('input', 'เลือกชื่อของคุณ');
   const t = S.tries[me.id] = S.tries[me.id] || { n: 0 };
   if (t.n >= 5) return fail('locked', 'ใส่รหัสผิดเกิน 5 ครั้ง บัญชี LINE นี้ถูกล็อก ติดต่อผู้ดูแล');
@@ -372,13 +376,13 @@ if (a === 'view' || a === 'confirm') {
     if (a === 'view') push(OWNER, text('👀 มี LINE ที่ยังไม่ได้เชื่อมเป็นนิติกรรม สแกน QR คูปอง ' + c.code + '\nLINE: ' + me.name + '\nเวลา: ' + th(nowIso) + '\nยังยืนยันสิทธิ์ไม่ได้จนกว่าจะเชื่อม LINE ด้วยรหัส'));
     return done({ ok: true, limited: true, role: null, coupon: { code: c.code, tierLabel: T.label, status: c.status },
       msg: 'คูปองนี้สำหรับเจ้าหน้าที่นิติกรรม Land for Loan เท่านั้น', canBind: true,
-      seats: SEATS.map(s => ({ key: s.key, name: s.name, full: Object.values(S.staff).filter(x => x.seat === s.key).length >= s.max })) });
+      seats: allSeats().filter(s => seatOk(s.key)).map(s => ({ key: s.key, name: s.name, full: Object.values(S.staff).filter(x => x.seat === s.key).length >= s.max })) });
   }
   const tokenOk = c.token && p.t === c.token;
-  const base = { ok: true, role: myRole, canConfirm: myRole === 'legal', coupon: Object.assign(pub(c, true), { token: undefined }), tokenOk };
+  const base = { ok: true, role: myRole, canConfirm: myRole === 'legal' || myRole === 'owner', coupon: Object.assign(pub(c, true), { token: undefined }), tokenOk };
   if (a === 'view') return done(base);
   // confirm
-  if (myRole !== 'legal') return fail('role', 'ปุ่มยืนยันสิทธิ์ใช้ได้เฉพาะนิติกรรม');
+  if (myRole !== 'legal' && myRole !== 'owner') return fail('role', 'ปุ่มยืนยันสิทธิ์ใช้ได้เฉพาะนิติกรรมและผู้ดูแล');
   if (c.status === 'used') return done({ ok: false, error: 'used', msg: 'คูปองนี้ใช้สิทธิ์ไปแล้วเมื่อ ' + th(c.usedAt) + ' โดย ' + c.usedByName, coupon: base.coupon });
   if (c.status !== 'requested') return fail('state', 'นายทุนยังไม่ได้กดใช้สิทธิ์ หรือยกเลิกคำขอแล้ว');
   if (!tokenOk) return fail('qr_old', 'QR นี้เป็นรุ่นเก่า ให้นายทุนเปิด QR ล่าสุดในคูปองของฉัน');
@@ -389,7 +393,7 @@ if (a === 'view' || a === 'confirm') {
   const proxyName = mode === 'poa' ? String(p.proxyName || '').trim().slice(0, 80) : '';
   if (mode === 'poa' && !proxyName) return fail('input', 'กรอกชื่อผู้รับมอบอำนาจ');
   c.req = { caseCode, date: nowIso.slice(0, 10), mode, proxyName };
-  c.status = 'used'; c.usedAt = nowIso; c.usedBy = me.id; c.usedByName = staffOf(me.id).name; c.token = null;
+  c.status = 'used'; c.usedAt = nowIso; c.usedBy = me.id; c.usedByName = staffOf(me.id) ? staffOf(me.id).name : me.name + ' (ผู้ดูแล)'; c.token = null;
   log('ยืนยันสิทธิ์ เคส ' + (c.req && c.req.caseCode), c.code);
   push(c.uid, receiptFlex(c, 'ใช้สิทธิ์ Voucher เรียบร้อย'));
   push(me.id, receiptFlex(c, 'ยืนยันสิทธิ์สำเร็จ'));
@@ -402,7 +406,7 @@ if (myRole !== 'owner') return fail('role', 'ทำรายการนี้�
 
 if (a === 'admin') {
   return done({ ok: true,
-    seats: SEATS.map(s => ({ key: s.key, name: s.name, max: s.max, pin: S.pins[s.key],
+    seats: allSeats().map(s => ({ key: s.key, name: s.name, max: s.max, pin: S.pins[s.key], extra: !!s.extra, until: s.until || null, expired: !seatOk(s.key),
       lines: Object.entries(S.staff).filter(([, x]) => x.seat === s.key).map(([id, x]) => ({ id, lineName: x.lineName, at: x.at })) })),
     coupons: Object.values(S.coupons).sort((x, y) => y.issuedAt.localeCompare(x.issuedAt)).map(c => Object.assign(pub(c, true), { token: undefined, uid: c.uid })),
     log: S.log.slice(0, 60) });
@@ -417,8 +421,30 @@ if (a === 'unbind') {
   return done({ ok: true });
 }
 
+if (a === 'addSeat') {
+  const name = String(p.name || '').trim().slice(0, 60);
+  if (name.length < 2) return fail('input', 'กรอกชื่อเจ้าหน้าที่');
+  const days = Number(p.days) || 0;
+  let until = null;
+  if (days > 0) { const d = new Date(now.getTime() + 7 * 3600e3); d.setUTCHours(0, 0, 0, 0); until = new Date(d.getTime() + days * 864e5 - 7 * 3600e3 - 1000).toISOString(); }
+  const key = 'x' + rand(5, 'abcdefghjkmnpqrstuvwxyz23456789');
+  S.extraSeats.push({ key, name: name + ' (แทนนิติกรรม)', max: 1, extra: true, until, at: nowIso });
+  S.pins[key] = String(1000 + Math.floor(Math.random() * 9000));
+  log('เพิ่มสิทธิ์นิติกรรมให้ ' + name + (until ? ' ถึง ' + th(until) : ' (ไม่หมดอายุ)'));
+  return done({ ok: true, pin: S.pins[key] });
+}
+
+if (a === 'removeSeat') {
+  const i = S.extraSeats.findIndex(x => x.key === p.seat);
+  if (i < 0) return fail('notfound', 'ลบได้เฉพาะสิทธิ์ที่เพิ่มเอง');
+  const s = S.extraSeats[i]; S.extraSeats.splice(i, 1);
+  Object.keys(S.staff).forEach(id => { if (S.staff[id].seat === s.key) { push(id, text('ℹ️ สิทธิ์นิติกรรมชั่วคราวของคุณในระบบ Voucher วันเกิดสิ้นสุดแล้ว')); delete S.staff[id]; } });
+  log('ลบสิทธิ์นิติกรรมของ ' + s.name);
+  return done({ ok: true });
+}
+
 if (a === 'newPin') {
-  const seat = SEATS.find(x => x.key === p.seat);
+  const seat = allSeats().find(x => x.key === p.seat);
   if (!seat) return fail('input', 'ไม่พบชื่อนี้');
   S.pins[seat.key] = String(1000 + Math.floor(Math.random() * 9000));
   log('ออกรหัสเชื่อม LINE ใหม่ให้ ' + seat.name);
@@ -590,15 +616,14 @@ async function renderScan(){
   if (!r.ok) { b.innerHTML = '<div class="banner b-red">'+esc(r.msg)+'</div>'; show('scan'); return; }
   const c = r.coupon;
   if (r.limited) {
-    let h = '<div class="banner b-grey">คูปอง '+esc(c.code)+'<div style="font-weight:500;font-size:14px;margin-top:6px">'+esc(r.msg)+'</div></div>';
-    if (r.canBind) h += '<div class="card" style="display:flex;flex-direction:column;gap:12px"><b>เจ้าหน้าที่นิติกรรม · เชื่อม LINE ครั้งแรก</b>'+
+    let h = '<div class="banner b-red" style="text-align:center;padding:22px 16px"><div style="font-size:40px;line-height:1">🔒</div><div style="font-size:19px;margin-top:8px">QR นี้ใช้ได้เฉพาะเจ้าหน้าที่นิติกรรม<br>Land for Loan เท่านั้น</div><div style="font-weight:500;font-size:14px;margin-top:8px;opacity:.9">ไม่สามารถดูรายละเอียดหรือใช้สิทธิ์คูปองนี้ได้ · ระบบบันทึกการสแกนนี้แล้ว</div></div>';
+    if (r.canBind) h += '<button class="link" id="iamLegal" style="text-decoration:underline">ฉันเป็นเจ้าหน้าที่นิติกรรม · เชื่อม LINE ครั้งแรก</button><div class="card" id="bindBox" hidden style="display:flex;flex-direction:column;gap:12px"><b>เจ้าหน้าที่นิติกรรม · เชื่อม LINE ครั้งแรก</b>'+
       '<div class="sub">เลือกชื่อของคุณ แล้วใส่รหัส 4 หลักที่ได้รับจากผู้ดูแล ทำครั้งเดียว ครั้งต่อไปสแกนแล้วยืนยันได้เลย</div>'+
       '<div style="display:grid;gap:8px">'+r.seats.map(s => '<button class="btn alt" style="min-height:44px;font-size:15px;text-align:left" data-seat="'+s.key+'" aria-pressed="false" '+(s.full?'disabled':'')+'>'+esc(s.name)+(s.full?' · เชื่อมแล้ว':'')+'</button>').join('')+'</div>'+
       '<div><label class="f" for="pin">รหัส 4 หลัก'+(LOCAL.on?' <span class="sub">(เดโม: 1234)</span>':'')+'</label><input id="pin" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="••••"></div>'+
       '<button class="btn" id="bindBtn">เชื่อม LINE ของฉัน</button></div>';
-    else h += '<div class="card sub">ระบบบันทึกการสแกนนี้และแจ้งผู้ดูแลแล้ว</div>';
-    h += '<div class="card sub">ถ้าคุณไม่ใช่เจ้าหน้าที่นิติกรรม ระบบบันทึกการสแกนนี้และแจ้งผู้ดูแลแล้ว</div>';
     b.innerHTML = h; show('scan');
+    const il = $('#iamLegal'); if (il) il.onclick = () => { il.hidden = true; $('#bindBox').hidden = false; };
     let seat = null;
     b.querySelectorAll('[data-seat]').forEach(x => x.onclick = () => { seat = x.dataset.seat; b.querySelectorAll('[data-seat]').forEach(y => { const on = y === x; y.setAttribute('aria-pressed', on); y.style.borderColor = on ? '#111827' : ''; y.style.fontWeight = on ? '700' : ''; }); });
     const bb = $('#bindBtn');
@@ -624,7 +649,7 @@ async function renderScan(){
       '<div><span style="font-size:15px;font-weight:700;display:block;margin-bottom:6px">ผู้มาทำนิติกรรม</span><div class="seg"><button id="sSelf" aria-pressed="true">นายทุนมาเอง</button><button id="sPoa" aria-pressed="false">ผู้รับมอบอำนาจ</button></div></div>'+
       '<div id="sProxyWrap" hidden><label class="f" for="sProxy">ชื่อผู้รับมอบอำนาจ</label><input id="sProxy" placeholder="ชื่อ-นามสกุล"></div></div>'+
       '<div class="sub">กดหลังทำนิติกรรมเคสนี้เสร็จแล้วเท่านั้น</div><button class="btn green" id="confirmBtn">ยืนยันสิทธิ์</button>';
-    else h += '<div class="card sub">คุณดูได้อย่างเดียว ปุ่มยืนยันสิทธิ์ใช้ได้เฉพาะเจ้าหน้าที่นิติกรรม</div>';
+    else h += '<div class="card sub">คุณดูได้อย่างเดียว ปุ่มยืนยันสิทธิ์ใช้ได้เฉพาะเจ้าหน้าที่นิติกรรมและผู้ดูแล</div>';
   }
   if (c.scans && c.scans.length) h += '<div class="card"><b style="font-size:14px">ประวัติการสแกน</b><div class="logl" style="margin-top:8px">'+c.scans.map(s=>'<div>'+ft(s.at)+' · '+esc(s.name)+' ('+esc(RL(s.role))+')</div>').join('')+'</div></div>';
   b.innerHTML = h; show('scan');
@@ -660,11 +685,14 @@ async function renderAdmin(){
     '<div class="card" style="display:flex;flex-direction:column;gap:10px"><b>ส่งกล่องของขวัญทดสอบเข้า LINE ตัวเอง</b>'+
       '<input id="iName" value="'+esc(ME.name)+'" aria-label="ชื่อนายทุน"><select id="iTier" aria-label="ระดับ"><option value="gold">GOLD · 5,000</option><option value="platinum">PLATINUM · 7,000</option><option value="diamond" selected>DIAMOND · 10,000</option></select>'+
       '<button class="btn" id="issueBtn">ส่งกล่องของขวัญ</button></div>'+
-    '<div class="card"><b>เจ้าหน้าที่นิติกรรม (ล็อกไว้ '+r.seats.length+' คน)</b><div class="sub" style="margin-top:2px">ให้รหัสแต่ละคนทางส่วนตัว ใช้ครั้งเดียวตอนสแกน QR ครั้งแรก</div>'+
-      r.seats.map(s => '<div style="margin-top:12px;padding-top:10px;border-top:1px solid #E5E7EB"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><b>'+esc(s.name)+'</b><span>รหัส <b style="font-size:17px;letter-spacing:2px">'+esc(s.pin)+'</b></span></div>'+
+    '<div class="card"><b>เจ้าหน้าที่นิติกรรม ('+r.seats.filter(s=>!s.extra).length+' คน'+(r.seats.some(s=>s.extra)?' + สิทธิ์แทน '+r.seats.filter(s=>s.extra).length+' คน':'')+')</b><div class="sub" style="margin-top:2px">ให้รหัสแต่ละคนทางส่วนตัว ใช้ครั้งเดียวตอนสแกน QR ครั้งแรก</div>'+
+      r.seats.map(s => '<div style="margin-top:12px;padding-top:10px;border-top:1px solid #E5E7EB"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><b>'+esc(s.name)+(s.extra?' <span class="st" style="background:'+(s.expired?'#FEE2E2;color:#991B1B':'#FEF3C7;color:#92400E')+'">'+(s.expired?'หมดสิทธิ์แล้ว':(s.until?'ถึง '+fd(s.until):'ไม่หมดอายุ'))+'</span>':'')+'</b><span>รหัส <b style="font-size:17px;letter-spacing:2px">'+esc(s.pin)+'</b></span></div>'+
         '<div class="sub">เชื่อมแล้ว '+s.lines.length+'/'+s.max+' LINE</div>'+
         s.lines.map(l => '<div style="display:flex;gap:8px;align-items:center;margin-top:6px"><span style="flex:1">LINE: '+esc(l.lineName)+' <span class="sub">· '+ft(l.at)+'</span></span><button class="btn alt" style="width:auto;min-height:36px;font-size:13px" data-unbind="'+l.id+'">ปลด</button></div>').join('')+
-        '<button class="link" style="align-self:flex-start;padding:0" data-newpin="'+s.key+'">ออกรหัสใหม่</button></div>').join('')+'</div>'+
+        '<button class="link" style="align-self:flex-start;padding:0" data-newpin="'+s.key+'">ออกรหัสใหม่</button>'+(s.extra?' <button class="link" style="padding:0 0 0 12px;color:#B91C1C" data-rmseat="'+s.key+'">ลบสิทธิ์</button>':'')+'</div>').join('')+
+      '<div style="margin-top:14px;padding-top:12px;border-top:1px solid #E5E7EB;display:flex;flex-direction:column;gap:8px"><b>เพิ่มคนทำแทนนิติกรรม</b><div class="sub">เช่น นิติกรรมไม่ว่าง ให้แอดมินไปทำแทน ระบบออกรหัส 4 หลักให้ ส่งให้คนนั้นทางส่วนตัว</div>'+
+      '<input id="xName" placeholder="ชื่อ เช่น แอดมิน วุ้นเส้น"><select id="xDays" aria-label="ระยะเวลา"><option value="1">วันนี้วันเดียว</option><option value="7">7 วัน</option><option value="30">30 วัน</option><option value="0">ไม่หมดอายุ (จนกว่าจะลบ)</option></select>'+
+      '<button class="btn" id="addSeatBtn">เพิ่มสิทธิ์</button></div></div>'+
     '<div class="card"><b>คูปองทั้งหมด ('+r.coupons.length+')</b>'+r.coupons.map(c => '<div style="margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap"><div style="flex:1;min-width:160px"><b>'+esc(c.code)+'</b> · '+esc(c.investorName)+'<div class="sub">'+esc(c.tierLabel.replace(' INVESTOR',''))+' · <span class="st st-'+c.status+'">'+ST[c.status]+'</span>'+(c.usedByName?' · ยืนยันโดย '+esc(c.usedByName):'')+'</div></div>'+(c.status==='used'?'<button class="btn alt" style="width:auto;min-height:40px" data-undo="'+esc(c.code)+'">ยกเลิกการใช้สิทธิ์</button>':'')+'</div>').join('')+'</div>'+
     '<div class="card"><b>ประวัติ</b><div class="logl" style="margin-top:8px">'+r.log.map(l => '<div>'+ft(l.at)+' · '+esc(l.byName)+' ('+esc(RL(l.role))+')<br>'+esc(l.what)+(l.code?' · '+esc(l.code):'')+'</div>').join('')+'</div></div>'+
     '<button class="btn alt" id="resetBtn">ล้างข้อมูลทดสอบ (ลบคูปองทั้งหมด)</button>';
@@ -672,6 +700,10 @@ async function renderAdmin(){
   b.querySelectorAll('[data-unbind]').forEach(x => x.onclick = async () => {
     if (x.dataset.armed !== '1') { x.dataset.armed = '1'; x.textContent = 'ยืนยันปลด'; return; }
     const y = await act(x, 'unbind', { uid: x.dataset.unbind }); if (y && y.ok) renderAdmin(); });
+  $('#addSeatBtn').onclick = async () => { const n = $('#xName').value.trim(); if (!n) { toast('กรอกชื่อก่อน'); return; } const y = await act($('#addSeatBtn'), 'addSeat', { name: n, days: $('#xDays').value }); if (y && y.ok) { toast('เพิ่มสิทธิ์แล้ว รหัส ' + y.pin); renderAdmin(); } };
+  b.querySelectorAll('[data-rmseat]').forEach(x => x.onclick = async () => {
+    if (x.dataset.armed !== '1') { x.dataset.armed = '1'; x.textContent = 'ยืนยันลบสิทธิ์'; return; }
+    const y = await act(x, 'removeSeat', { seat: x.dataset.rmseat }); if (y && y.ok) renderAdmin(); });
   b.querySelectorAll('[data-newpin]').forEach(x => x.onclick = async () => { const y = await act(x, 'newPin', { seat: x.dataset.newpin }); if (y && y.ok) { toast('ออกรหัสใหม่แล้ว'); renderAdmin(); } });
   b.querySelectorAll('[data-undo]').forEach(x => x.onclick = async () => {
     if (x.dataset.armed !== '1') { x.dataset.armed = '1'; x.textContent = 'แตะอีกครั้งเพื่อยืนยัน'; return; }
