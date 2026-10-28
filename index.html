@@ -534,6 +534,7 @@ function renderDetail(){
   } else if (c.status === 'requested') {
     h += '<div class="banner b-blue">แสดง QR นี้ให้เจ้าหน้าที่นิติกรรมสแกน<div style="font-weight:500;font-size:14px;margin-top:4px">เจ้าหน้าที่จะใส่เคสและยืนยันสิทธิ์ให้ หลังทำนิติกรรมเสร็จ</div></div>'+
       '<div class="qrbox"><div id="qr"></div><b>'+esc(c.code)+'</b><div class="sub" style="text-align:center">ไปเองที่หน้างาน: เปิดหน้านี้ให้เจ้าหน้าที่สแกน<br>มอบอำนาจ: 📸 แคปหน้าจอนี้ ส่งให้ผู้รับมอบอำนาจหรือเจ้าหน้าที่ทาง LINE</div></div>'+
+      (LOCAL.on ? '<div class="card" style="display:flex;flex-direction:column;gap:8px"><b>ทดสอบด้วยมือถือเครื่องเดียว</b><div class="sub">มือถือสแกนจอตัวเองไม่ได้ กดปุ่มนี้เพื่อเปิดหน้าที่นิติกรรมจะเห็นหลังสแกน QR หรือแคปหน้าจอ QR ส่งให้อีกเครื่องสแกนจากรูป</div><button class="btn" style="background:#15803D;color:#fff" id="actLegal">เปิดหน้านิติกรรม (ทดสอบ)</button></div>' : '')+
       '<button class="btn alt" id="cancelUse">ยกเลิกคำขอใช้สิทธิ์</button>';
   } else if (c.status === 'used') {
     h += receipt(c, 'ใช้สิทธิ์เรียบร้อย');
@@ -542,6 +543,7 @@ function renderDetail(){
   b.innerHTML = h;
   if (c.status === 'requested' && window.QRCode) new QRCode($('#qr'), { text: c.qr || (location.origin + '/'), width: 440, height: 440, correctLevel: QRCode.CorrectLevel.M });
   const g = $('#goUse'); if (g) g.onclick = async () => { const r = await act(g, 'use', { code: c.code }); if (r && r.ok) { await reloadMe(); openCoupon(c.code); } };
+  const al = $('#actLegal'); if (al) al.onclick = () => { const u = new URL(c.qr); location.href = location.pathname + u.search; };
   const x = $('#cancelUse'); if (x) x.onclick = async () => { const r = await act(x, 'cancelUse', {code:c.code}); if (r && r.ok) { await reloadMe(); openCoupon(c.code); toast('ยกเลิกคำขอแล้ว'); } };
   $('#toWallet').onclick = () => { theme('gold'); renderWallet(); show('wallet'); };
 }
