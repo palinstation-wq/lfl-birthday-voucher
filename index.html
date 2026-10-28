@@ -175,6 +175,8 @@ dl.kv dt{color:#6B7280}dl.kv dd{margin:0;font-weight:600;overflow-wrap:anywhere}
 
 <script>
 const LIFF_ID = '2012219844-0WR53piV';
+const PORT_URL = 'https://liff.line.me/2009762947-5tJOwQ8j'; // ลิงก์หน้าพอร์ตนายทุน (ใส่เมื่อได้ลิงก์จริง)
+function openPort(){ const u = PORT_URL || ''; if (!u) { toast('หน้าพอร์ตยังไม่ได้ใส่ลิงก์'); return; } try { if (window.liff && liff.isInClient && liff.isInClient()) { liff.openWindow({ url: u, external: false }); return; } } catch (e) {} window.open(u, '_blank'); }
 const API = 'https://n8n.srv1926160.hstgr.cloud/webhook/lfl-voucher-test';
 const THEME = {
   gold:{},
@@ -198,7 +200,7 @@ const LOCAL = { on: false, me: null, S: null,
     if ((action === 'view' || action === 'confirm') && !(S.coupons && S.coupons[P.code]) && qs.get('tier')) {
       S.coupons = S.coupons || {};
       const now = new Date();
-      S.coupons[P.code] = { code: P.code, uid: 'investor', name: qs.get('n') || 'นายทุน', tier: qs.get('tier'), year: now.getFullYear(), status: 'requested', token: P.t, issuedAt: now.toISOString(), expiresAt: new Date(now.getTime() + 60*864e5).toISOString(), scans: [] };
+      S.coupons[P.code] = { code: P.code, uid: 'investor', name: qs.get('n') || 'นายทุน', tier: qs.get('tier'), invested: Number(qs.get('inv')) || null, year: now.getFullYear(), status: 'requested', token: P.t, issuedAt: now.toISOString(), expiresAt: new Date(now.getTime() + 60*864e5).toISOString(), scans: [] };
     }
     const out = ROUTER(() => S, () => ({ first: () => ({ json: { p: P } }) }), { sub: this.me.id, name: this.me.name });
     if (S.pins) Object.keys(S.pins).forEach(k => S.pins[k] = '1234');
@@ -207,10 +209,13 @@ const LOCAL = { on: false, me: null, S: null,
   },
   ensureCoupon(){
     const S = this.S; S.coupons = S.coupons || {};
-    if (Object.values(S.coupons).some(c => c.uid === this.me.id && c.status !== 'used')) return;
-    const now = new Date(), tier = ['gold','platinum','diamond'].includes(qs.get('tier')) ? qs.get('tier') : 'diamond';
+    const tier = ['gold','platinum','diamond'].includes(qs.get('tier')) ? qs.get('tier') : 'diamond';
+    const inv = Number(qs.get('inv')) || ({ gold: 2500000, platinum: 4200000, diamond: 8500000 })[tier];
+    const open = Object.values(S.coupons).filter(c => c.uid === this.me.id && c.status !== 'used');
+    if (open.length) { open.forEach(c => { if (!c.invested) c.invested = inv; }); this.save(); return; }
+    const now = new Date();
     const code = 'HBD-' + String(now.getFullYear() + 543).slice(2) + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(1000 + Math.floor(Math.random() * 9000));
-    S.coupons[code] = { code, uid: this.me.id, name: qs.get('name') || this.me.name, tier, year: now.getFullYear(), status: 'issued', issuedAt: now.toISOString(), expiresAt: new Date(now.getTime() + 60*864e5).toISOString(), scans: [] };
+    S.coupons[code] = { code, uid: this.me.id, name: qs.get('name') || this.me.name, tier, invested: inv, year: now.getFullYear(), status: 'issued', issuedAt: now.toISOString(), expiresAt: new Date(now.getTime() + 60*864e5).toISOString(), scans: [] };
     this.save();
   }
 };
@@ -269,7 +274,7 @@ const text = (t) => ({ type: 'text', text: t });
 const legalIds = () => Object.entries(S.staff).filter(([, s]) => s.status === 'approved' && s.role === 'legal').map(([id]) => id);
 const pub = (c, full) => {
   const T = TIERS[c.tier];
-  const o = { code: c.code, tier: c.tier, tierLabel: T.label, amount: T.amount, status: c.status, investorName: c.name, issuedAt: c.issuedAt, expiresAt: c.expiresAt, claimedAt: c.claimedAt || null };
+  const o = { code: c.code, tier: c.tier, tierLabel: T.label, amount: T.amount, status: c.status, investorName: c.name, issuedAt: c.issuedAt, expiresAt: c.expiresAt, claimedAt: c.claimedAt || null, invested: c.invested || null };
   if (full) Object.assign(o, { req: c.req || null, token: c.uid === me.id ? (c.token || null) : undefined, usedAt: c.usedAt || null, usedByName: c.usedByName || null, scans: (c.scans || []).slice(0, 10) });
   return o;
 };
@@ -461,7 +466,7 @@ if (a === 'issue') {
   if (dup) return fail('dup', 'บัญชีนี้มีคูปองวันเกิดปีนี้แล้ว (' + dup.code + ') กด "ล้างข้อมูลทดสอบ" ก่อนถ้าจะทดสอบใหม่');
   const yymm = String(yr + 543).slice(2) + String(now.getMonth() + 1).padStart(2, '0');
   let code; do { code = 'HBD-' + yymm + '-' + rand(4, '0123456789'); } while (S.coupons[code]);
-  const c = { code, uid: to, name, tier, year: yr, status: 'issued', issuedAt: nowIso, expiresAt: new Date(now.getTime() + VALID_DAYS * 864e5).toISOString(), scans: [] };
+  const c = { code, uid: to, name, tier, invested: Number(P.invested) || null, year: yr, status: 'issued', issuedAt: nowIso, expiresAt: new Date(now.getTime() + VALID_DAYS * 864e5).toISOString(), scans: [] };
   S.coupons[code] = c;
   log('ออกคูปอง ' + tier.toUpperCase() + ' ให้ ' + name, code);
   push(to, giftFlex(c));
@@ -521,14 +526,14 @@ function ticket(c){
   return '<div class="tTop"><div class="pill">'+esc(c.tierLabel)+'</div>'+
     '<div style="font-size:15px;margin-top:8px;color:var(--cardMuted)">ของขวัญวันเกิด · ส่วนลด</div>'+
     '<div style="display:flex;align-items:baseline;gap:8px;justify-content:center"><div class="amt">'+baht(c.amount)+'</div><div style="font-size:20px;font-weight:700;color:var(--num)">บาท</div></div>'+
-    '<div style="font-size:15px;font-weight:600;color:var(--cardText)">เมื่อลงทุนทรัพย์ 1 ชิ้น</div></div>'+
+    (c.invested ? '<div style="font-size:14px;color:var(--cardMuted);margin-top:2px">ยอดลงทุนในสัญญาของคุณ</div><div style="font-size:17px;font-weight:700;color:var(--cardText)">'+baht(c.invested)+' บาท</div>' : '<div style="font-size:15px;font-weight:600;color:var(--cardText)">เมื่อลงทุนทรัพย์ 1 ชิ้น</div>')+'<button type="button" onclick="openPort()" style="margin-top:12px;padding:8px 18px;border-radius:999px;border:1.5px solid var(--num);background:transparent;color:var(--num);font:600 14px inherit;font-family:inherit;cursor:pointer">ดูพอร์ตของฉัน ›</button></div>'+
     '<div class="perf"></div><div class="tBot"><div>รหัส<br><b>'+esc(c.code)+'</b></div><div style="text-align:right">ใช้ได้ถึง<br><b>'+fd(c.expiresAt)+'</b></div></div>';
 }
 function receipt(c, title){
   const r = c.req || {};
   return '<div class="rec"><div class="h"><b>✅ '+esc(title)+'</b><span>'+ft(c.usedAt)+'</span></div><div class="bd"><dl class="kv">'+
     '<dt>นายทุน</dt><dd>'+esc(c.investorName)+'</dd><dt>คูปอง</dt><dd>'+esc(c.code)+'</dd>'+
-    '<dt>ระดับ</dt><dd>'+esc(c.tierLabel.replace(' INVESTOR',''))+' · '+baht(c.amount)+' บาท</dd>'+
+    '<dt>ระดับ</dt><dd>'+esc(c.tierLabel.replace(' INVESTOR',''))+' · '+baht(c.amount)+' บาท</dd>'+(c.invested ? '<dt>ยอดลงทุน</dt><dd>'+baht(c.invested)+' บาท</dd>' : '')+
     '<dt>เคส</dt><dd>'+esc(r.caseCode||'-')+'</dd><dt>วันที่ทำ</dt><dd>'+fd(r.date)+'</dd>'+
     '<dt>ผู้มาทำ</dt><dd>'+(r.mode==='poa'?'ผู้รับมอบอำนาจ: '+esc(r.proxyName):'นายทุนมาเอง')+'</dd>'+
     '<dt>ยืนยันโดย</dt><dd>'+esc(c.usedByName||'-')+'</dd></dl>'+
@@ -607,7 +612,7 @@ $('#useSubmit').onclick = async () => {
 };
 async function reloadMe(){
   const r = await api('me'); if (!r.ok) throw new Error(r.msg);
-  ME = r.me; COUPONS = r.coupons.map(c => { if (c.status === 'requested' && c.token) c.qr = 'https://liff.line.me/' + LIFF_ID + '?view=scan&c=' + encodeURIComponent(c.code) + '&t=' + c.token + (LOCAL.on ? '&demo=1&tier=' + c.tier + '&n=' + encodeURIComponent(c.investorName) : ''); return c; });
+  ME = r.me; COUPONS = r.coupons.map(c => { if (c.status === 'requested' && c.token) c.qr = 'https://liff.line.me/' + LIFF_ID + '?view=scan&c=' + encodeURIComponent(c.code) + '&t=' + c.token + (LOCAL.on ? '&demo=1&tier=' + c.tier + (c.invested ? '&inv=' + c.invested : '') + '&n=' + encodeURIComponent(c.investorName) : ''); return c; });
 }
 
 /* ---------- นิติกรรม: สแกน ---------- */
