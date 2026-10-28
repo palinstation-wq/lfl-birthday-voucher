@@ -533,7 +533,7 @@ function receipt(c, title){
   const r = c.req || {};
   return '<div class="rec"><div class="h"><b>✅ '+esc(title)+'</b><span>'+ft(c.usedAt)+'</span></div><div class="bd"><dl class="kv">'+
     '<dt>นายทุน</dt><dd>'+esc(c.investorName)+'</dd><dt>คูปอง</dt><dd>'+esc(c.code)+'</dd>'+
-    '<dt>ระดับ</dt><dd>'+esc(c.tierLabel.replace(' INVESTOR',''))+' · '+baht(c.amount)+' บาท</dd>'+
+    '<dt>ระดับ</dt><dd style="color:'+(TCOL[c.tier]||'inherit')+';font-weight:700">'+esc(c.tierLabel.replace(' INVESTOR',''))+' · '+baht(c.amount)+' บาท</dd>'+
     '<dt>เคส</dt><dd>'+esc(r.caseCode||'-')+'</dd><dt>วันที่ทำ</dt><dd>'+fd(r.date)+'</dd>'+
     '<dt>ผู้มาทำ</dt><dd>'+(r.mode==='poa'?'ผู้รับมอบอำนาจ: '+esc(r.proxyName):'นายทุนมาเอง')+'</dd>'+
     '<dt>ยืนยันโดย</dt><dd>'+esc(c.usedByName||'-')+'</dd></dl>'+
