@@ -526,7 +526,7 @@ function ticket(c){
   return '<div class="tTop"><div class="pill">'+esc(c.tierLabel)+'</div>'+
     '<div style="font-size:15px;margin-top:8px;color:var(--cardMuted)">ของขวัญวันเกิด · ส่วนลด</div>'+
     '<div style="display:flex;align-items:baseline;gap:8px;justify-content:center"><div class="amt">'+baht(c.amount)+'</div><div style="font-size:20px;font-weight:700;color:var(--num)">บาท</div></div>'+
-    (c.invested ? '<div style="font-size:14px;color:var(--cardMuted);margin-top:2px">ยอดลงทุนในสัญญาของคุณ</div><div style="font-size:17px;font-weight:700;color:var(--cardText)">'+baht(c.invested)+' บาท</div>' : '<div style="font-size:15px;font-weight:600;color:var(--cardText)">เมื่อลงทุนทรัพย์ 1 ชิ้น</div>')+'<button type="button" onclick="openPort()" style="margin-top:12px;padding:8px 18px;border-radius:999px;border:1.5px solid var(--num);background:transparent;color:var(--num);font:600 14px inherit;font-family:inherit;cursor:pointer">ดูพอร์ตของฉัน ›</button></div>'+
+    (c.invested ? '<div style="font-size:14px;color:var(--cardMuted);margin-top:2px">ยอดลงทุนในสัญญาของคุณ</div><div style="font-size:17px;font-weight:700;color:var(--cardText)">'+baht(c.invested)+' บาท</div>' : '<div style="font-size:15px;font-weight:600;color:var(--cardText)">เมื่อลงทุนทรัพย์ 1 ชิ้น</div>')+'<button type="button" onclick="openPort()" style="margin-top:12px;padding:8px 18px;border-radius:999px;border:1.5px solid var(--num);background:transparent;color:var(--num);font-size:15px;font-weight:700;font-family:inherit;cursor:pointer">ดูพอร์ตของฉัน ›</button></div>'+
     '<div class="perf"></div><div class="tBot"><div>รหัส<br><b>'+esc(c.code)+'</b></div><div style="text-align:right">ใช้ได้ถึง<br><b>'+fd(c.expiresAt)+'</b></div></div>';
 }
 function receipt(c, title){
@@ -598,7 +598,7 @@ function openGift(){
 $('#giftBtn').onclick = openGift; $('#openBtn').onclick = openGift;
 $('#claimBtn').onclick = async () => {
   const r = await act($('#claimBtn'), 'claim', {code: CUR.code});
-  if (r && r.ok) { toast('รับสิทธิ์เรียบร้อย เก็บไว้ในคูปองของฉันแล้ว'); await reloadMe(); theme('gold'); renderWallet(); setTimeout(() => show('wallet'), 900); }
+  if (r && r.ok) { toast('รับสิทธิ์เรียบร้อย เก็บไว้ในคูปองของฉันแล้ว'); await reloadMe(); renderWallet(); show('wallet'); theme('gold'); }
 };
 $('#mSelf').onclick = () => { mode='self'; $('#mSelf').setAttribute('aria-pressed','true'); $('#mPoa').setAttribute('aria-pressed','false'); $('#proxyWrap').hidden = true; };
 $('#mPoa').onclick = () => { mode='poa'; $('#mPoa').setAttribute('aria-pressed','true'); $('#mSelf').setAttribute('aria-pressed','false'); $('#proxyWrap').hidden = false; };
