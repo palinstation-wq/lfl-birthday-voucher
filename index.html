@@ -206,7 +206,7 @@ const LOCAL = { on: false, me: null, S: null,
   },
   ensureCoupon(){
     const S = this.S; S.coupons = S.coupons || {};
-    if (Object.values(S.coupons).some(c => c.uid === this.me.id)) return;
+    if (Object.values(S.coupons).some(c => c.uid === this.me.id && c.status !== 'used')) return;
     const now = new Date(), tier = ['gold','platinum','diamond'].includes(qs.get('tier')) ? qs.get('tier') : 'diamond';
     const code = 'HBD-' + String(now.getFullYear() + 543).slice(2) + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(1000 + Math.floor(Math.random() * 9000));
     S.coupons[code] = { code, uid: this.me.id, name: qs.get('name') || this.me.name, tier, year: now.getFullYear(), status: 'issued', issuedAt: now.toISOString(), expiresAt: new Date(now.getTime() + 60*864e5).toISOString(), scans: [] };
