@@ -393,7 +393,7 @@ if (a === 'view' || a === 'confirm') {
   const proxyName = mode === 'poa' ? String(p.proxyName || '').trim().slice(0, 80) : '';
   if (mode === 'poa' && !proxyName) return fail('input', 'กรอกชื่อผู้รับมอบอำนาจ');
   c.req = { caseCode, date: nowIso.slice(0, 10), mode, proxyName };
-  c.status = 'used'; c.usedAt = nowIso; c.usedBy = me.id; c.usedByName = staffOf(me.id) ? staffOf(me.id).name : me.name + ' (ผู้ดูแล)'; c.token = null;
+  c.status = 'used'; c.usedAt = nowIso; c.usedBy = me.id; c.usedByName = staffOf(me.id) ? staffOf(me.id).name : me.name + ' (ผู้ดูแล)'; c.usedSeat = staffOf(me.id) ? staffOf(me.id).seat : 'owner'; c.token = null;
   log('ยืนยันสิทธิ์ เคส ' + (c.req && c.req.caseCode), c.code);
   push(c.uid, receiptFlex(c, 'ใช้สิทธิ์ Voucher เรียบร้อย'));
   push(me.id, receiptFlex(c, 'ยืนยันสิทธิ์สำเร็จ'));
@@ -406,7 +406,8 @@ if (myRole !== 'owner') return fail('role', 'ทำรายการนี้�
 
 if (a === 'admin') {
   return done({ ok: true,
-    seats: allSeats().map(s => ({ key: s.key, name: s.name, max: s.max, pin: S.pins[s.key], extra: !!s.extra, until: s.until || null, expired: !seatOk(s.key),
+    ownerConfirmed: Object.values(S.coupons).filter(c => c.status === 'used' && c.usedSeat === 'owner').map(c => ({ code: c.code, investorName: c.name, caseCode: c.req && c.req.caseCode, at: c.usedAt })),
+    seats: allSeats().map(s => ({ key: s.key, name: s.name, max: s.max, pin: S.pins[s.key], extra: !!s.extra, until: s.until || null, expired: !seatOk(s.key), confirmed: Object.values(S.coupons).filter(c => c.status === 'used' && c.usedSeat === s.key).sort((x, y) => (y.usedAt || '').localeCompare(x.usedAt || '')).map(c => ({ code: c.code, investorName: c.name, caseCode: c.req && c.req.caseCode, at: c.usedAt, by: c.usedByName })),
       lines: Object.entries(S.staff).filter(([, x]) => x.seat === s.key).map(([id, x]) => ({ id, lineName: x.lineName, at: x.at })) })),
     coupons: Object.values(S.coupons).sort((x, y) => y.issuedAt.localeCompare(x.issuedAt)).map(c => Object.assign(pub(c, true), { token: undefined, uid: c.uid })),
     log: S.log.slice(0, 60) });
@@ -687,7 +688,8 @@ async function renderAdmin(){
       '<button class="btn" id="issueBtn">ส่งกล่องของขวัญ</button></div>'+
     '<div class="card"><b>เจ้าหน้าที่นิติกรรม ('+r.seats.filter(s=>!s.extra).length+' คน'+(r.seats.some(s=>s.extra)?' + สิทธิ์แทน '+r.seats.filter(s=>s.extra).length+' คน':'')+')</b><div class="sub" style="margin-top:2px">ให้รหัสแต่ละคนทางส่วนตัว ใช้ครั้งเดียวตอนสแกน QR ครั้งแรก</div>'+
       r.seats.map(s => '<div style="margin-top:12px;padding-top:10px;border-top:1px solid #E5E7EB"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><b>'+esc(s.name)+(s.extra?' <span class="st" style="background:'+(s.expired?'#FEE2E2;color:#991B1B':'#FEF3C7;color:#92400E')+'">'+(s.expired?'หมดสิทธิ์แล้ว':(s.until?'ถึง '+fd(s.until):'ไม่หมดอายุ'))+'</span>':'')+'</b><span>รหัส <b style="font-size:17px;letter-spacing:2px">'+esc(s.pin)+'</b></span></div>'+
-        '<div class="sub">เชื่อมแล้ว '+s.lines.length+'/'+s.max+' LINE</div>'+
+        '<div class="sub">เชื่อมแล้ว '+s.lines.length+'/'+s.max+' LINE · <b style="color:#15803D">ยืนยันสิทธิ์แล้ว '+(s.confirmed||[]).length+' ครั้ง</b></div>'+
+        ((s.confirmed||[]).length ? '<details style="margin-top:4px"><summary class="sub" style="cursor:pointer">ดูรายการที่ยืนยัน</summary>'+s.confirmed.map(x => '<div class="sub" style="margin-top:4px;padding-left:8px;border-left:3px solid #DCFCE7">'+ft(x.at)+' · '+esc(x.code)+' · '+esc(x.investorName)+(x.caseCode?' · เคส '+esc(x.caseCode):'')+'</div>').join('')+'</details>' : '')+
         s.lines.map(l => '<div style="display:flex;gap:8px;align-items:center;margin-top:6px"><span style="flex:1">LINE: '+esc(l.lineName)+' <span class="sub">· '+ft(l.at)+'</span></span><button class="btn alt" style="width:auto;min-height:36px;font-size:13px" data-unbind="'+l.id+'">ปลด</button></div>').join('')+
         '<button class="link" style="align-self:flex-start;padding:0" data-newpin="'+s.key+'">ออกรหัสใหม่</button>'+(s.extra?' <button class="link" style="padding:0 0 0 12px;color:#B91C1C" data-rmseat="'+s.key+'">ลบสิทธิ์</button>':'')+'</div>').join('')+
       '<div style="margin-top:14px;padding-top:12px;border-top:1px solid #E5E7EB;display:flex;flex-direction:column;gap:8px"><b>เพิ่มคนทำแทนนิติกรรม</b><div class="sub">เช่น นิติกรรมไม่ว่าง ให้แอดมินไปทำแทน ระบบออกรหัส 4 หลักให้ ส่งให้คนนั้นทางส่วนตัว</div>'+
