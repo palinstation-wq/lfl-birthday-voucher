@@ -4,54 +4,73 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>ของขวัญวันเกิด · Land for Loan</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Noto+Serif+Thai:wght@700;900&display=swap">
 <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 :root{--bg:#FFF5E8;--circle:#FBE2D2;--text:#2B1B1B;--muted:#6E5C5C;--head:#D9192B;--script:#B8892E;--accent:#8A6A22;--pill:#D4A63E;--pillText:#2B1B1B;--btn:#D9192B;--btnText:#fff;--box:#D9192B;--lid:#B3121F;--ribbon:#D4A63E;--ribbonDark:#8A6A22;--card:#fff;--cardText:#2B1B1B;--cardMuted:#6E5C5C;--num:#D9192B;--dash:#E3CDB4}
 *{box-sizing:border-box}
-html,body{margin:0;height:100%}
+html,body{margin:0;min-height:100%}
 body{font-family:'IBM Plex Sans Thai',sans-serif;background:var(--bg);color:var(--text);-webkit-tap-highlight-color:transparent}
 button{font-family:inherit;cursor:pointer}
-.screen{display:none;min-height:100dvh;flex-direction:column;align-items:center;padding:28px 22px calc(24px + env(safe-area-inset-bottom));text-align:center;gap:6px;position:relative;overflow:hidden}
+.screen{display:none;min-height:100dvh;flex-direction:column;align-items:center;padding:24px 20px calc(24px + env(safe-area-inset-bottom));text-align:center;gap:6px;position:relative;overflow:hidden}
 .screen.on{display:flex}
-.btn{width:100%;max-width:420px;height:52px;border:0;border-radius:14px;background:var(--btn);color:var(--btnText);font-size:17px;font-weight:700}
-.btn[disabled]{opacity:.5}
-.link{border:0;background:transparent;color:var(--muted);font-size:14px;height:40px}
+.plain{background:#F3F4F6;color:#111827;text-align:left;align-items:stretch;gap:12px}
+.btn{width:100%;max-width:420px;align-self:center;min-height:52px;border:0;border-radius:14px;background:var(--btn);color:var(--btnText);font-size:17px;font-weight:700;padding:0 16px}
+.btn.alt{background:#fff;color:#111827;border:1.5px solid #D1D5DB}
+.btn.green{background:#15803D;color:#fff}
+.btn[disabled]{opacity:.45}
+.link{border:0;background:transparent;color:#6B7280;font-size:14px;min-height:40px;align-self:center}
 .tier{font-size:13px;font-weight:700;letter-spacing:4px;color:var(--accent)}
 .script{font-family:'Great Vibes',cursive;font-size:40px;line-height:1.1;color:var(--script)}
-.h1{font-family:'Noto Serif Thai',serif;font-weight:900;font-size:34px;line-height:1.25;color:var(--head)}
-.name{font-size:18px;font-weight:600}
+.h1{font-family:'Noto Serif Thai',serif;font-weight:900;font-size:32px;line-height:1.25;color:var(--head)}
 .muted{color:var(--muted);font-size:15px}
-.stage{flex:1;width:100%;display:flex;align-items:center;justify-content:center;position:relative;min-height:300px}
-.glow{position:absolute;width:270px;height:270px;border-radius:50%;background:var(--circle);animation:glow 2.4s ease-in-out infinite}
+.stage{flex:1;width:100%;display:flex;align-items:center;justify-content:center;position:relative;min-height:280px}
+.glow{position:absolute;width:260px;height:260px;border-radius:50%;background:var(--circle);animation:glow 2.4s ease-in-out infinite}
 .flash{position:absolute;width:200px;height:200px;border-radius:50%;background:#FFF3C4;opacity:0}
 .gift{position:relative;width:230px;height:240px;border:0;background:transparent;padding:0}
 .giftInner{position:relative;width:230px;height:240px;animation:wobble 1.8s ease-in-out infinite;transform-origin:50% 90%}
 .opening .giftInner{animation:shake .6s ease-in-out}
 .opening .lid{animation:lid .6s .45s ease-in forwards}
 .opening .flash{animation:flash .9s .6s ease-out forwards}
-.ticket{width:100%;max-width:340px;background:var(--card);border-radius:20px;box-shadow:0 18px 40px rgba(0,0,0,.18);overflow:hidden;margin-top:16px}
+.ticket{width:100%;max-width:340px;align-self:center;background:var(--card);border-radius:20px;box-shadow:0 18px 40px rgba(0,0,0,.16);overflow:hidden;margin-top:12px;text-align:center}
 .pop{animation:pop .7s cubic-bezier(.2,.9,.3,1.2) both}
-.tTop{padding:22px 22px 18px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.tTop{padding:20px 20px 16px;display:flex;flex-direction:column;align-items:center;gap:4px}
 .pill{padding:4px 14px;border-radius:999px;background:var(--pill);color:var(--pillText);font-size:11px;font-weight:700;letter-spacing:3px}
-.amt{font-family:'Noto Serif Thai',serif;font-weight:900;font-size:58px;line-height:1.15;color:var(--num)}
+.amt{font-family:'Noto Serif Thai',serif;font-weight:900;font-size:54px;line-height:1.15;color:var(--num)}
 .perf{position:relative;border-top:2px dashed var(--dash);margin:0 18px}
-.perf:before,.perf:after{content:"";position:absolute;top:-12px;width:22px;height:22px;border-radius:50%;background:var(--bg)}
-.perf:before{left:-32px}.perf:after{right:-32px}
-.tBot{padding:14px 22px 18px;display:flex;justify-content:space-between;font-size:13px;color:var(--cardMuted);text-align:left}
+.tBot{padding:12px 20px 16px;display:flex;justify-content:space-between;font-size:13px;color:var(--cardMuted);text-align:left}
 .tBot b{font-size:15px;color:var(--cardText)}
 .cf{position:absolute;top:0;border-radius:2px;animation:fall 2.6s linear both;pointer-events:none}
-.toast{position:fixed;left:50%;bottom:100px;transform:translateX(-50%);background:#111827;color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;display:none;z-index:9}
-#wallet,#redeem{background:#F3F4F6;color:#111827;text-align:left;align-items:stretch}
-.row{width:100%;border:0;padding:0;background:#fff;border-radius:16px;box-shadow:0 2px 8px rgba(0,0,0,.08);display:flex;overflow:hidden;text-align:left;color:#111827}
-.rowL{width:110px;flex:none;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px 6px;border-right:2px dashed var(--dash)}
-.rowL .a{font-family:'Noto Serif Thai',serif;font-weight:900;font-size:28px;color:var(--num)}
-.status{align-self:flex-start;margin-top:4px;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700}
-.box{background:#fff;border-radius:14px;padding:14px;font-size:14px;line-height:1.6}
-label{font-size:15px;font-weight:700;display:block;margin-bottom:6px}
-input{width:100%;height:48px;padding:0 12px;border:1.5px solid #D1D5DB;border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:#111827}
-.title{font-size:18px;font-weight:700;margin:0 0 10px}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#111827;color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;display:none;z-index:9;max-width:90vw;text-align:center}
+.card{background:#fff;border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.title{font-size:19px;font-weight:700;margin:0}
+.sub{font-size:13px;color:#6B7280}
+.rowc{width:100%;border:0;padding:0;background:#fff;border-radius:16px;box-shadow:0 2px 8px rgba(0,0,0,.08);display:flex;overflow:hidden;text-align:left;color:#111827}
+.rowL{width:104px;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 6px;border-right:2px dashed #E5E7EB}
+.rowL .a{font-family:'Noto Serif Thai',serif;font-weight:900;font-size:26px}
+.st{display:inline-block;margin-top:4px;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700}
+.st-issued{background:#FDE68A;color:#92400E}.st-claimed{background:#DCFCE7;color:#166534}.st-requested{background:#DBEAFE;color:#1E40AF}.st-used{background:#E5E7EB;color:#374151}.st-cancelled{background:#FEE2E2;color:#991B1B}
+label.f{font-size:15px;font-weight:700;display:block;margin-bottom:6px}
+input,select{width:100%;min-height:48px;padding:0 12px;border:1.5px solid #D1D5DB;border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:#111827}
+.seg{display:flex;gap:8px}
+.seg button{flex:1;min-height:48px;border-radius:10px;border:1.5px solid #D1D5DB;background:#fff;font-size:15px;font-weight:600;color:#374151}
+.seg button[aria-pressed="true"]{border-color:#111827;background:#111827;color:#fff}
+dl.kv{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;margin:0;font-size:15px}
+dl.kv dt{color:#6B7280}dl.kv dd{margin:0;font-weight:600;overflow-wrap:anywhere}
+.qrbox{background:#fff;border-radius:16px;padding:18px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.qrbox #qr img,.qrbox #qr canvas{width:220px!important;height:220px!important}
+.banner{border-radius:16px;padding:16px;color:#fff;font-weight:700}
+.b-green{background:#15803D}.b-red{background:#B91C1C}.b-grey{background:#4B5563}.b-blue{background:#1D4ED8}
+.rec{background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.1)}
+.rec .h{background:#15803D;color:#fff;padding:18px}
+.rec .h b{font-size:20px;display:block}
+.rec .bd{padding:16px}
+.small{font-size:12px;color:#6B7280}
+.logl{font-size:12.5px;display:grid;gap:6px}
+.logl div{border-left:3px solid #E5E7EB;padding-left:8px}
+.spin{width:36px;height:36px;border:4px solid #E5E7EB;border-top-color:#D9192B;border-radius:50%;animation:sp 1s linear infinite;margin:40px auto}
+@keyframes sp{to{transform:rotate(360deg)}}
 @keyframes wobble{0%,100%{transform:rotate(0) scale(1)}20%{transform:rotate(-6deg) scale(1.03)}40%{transform:rotate(5deg) scale(1.03)}60%{transform:rotate(-3deg)}80%{transform:rotate(2deg)}}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px) rotate(-4deg)}40%{transform:translateX(8px) rotate(4deg)}60%{transform:translateX(-6px) rotate(-3deg)}80%{transform:translateX(6px) rotate(3deg)}}
 @keyframes lid{to{transform:translateY(-160px) rotate(-35deg);opacity:0}}
@@ -62,176 +81,628 @@ input{width:100%;height:48px;padding:0 12px;border:1.5px solid #D1D5DB;border-ra
 </style>
 </head>
 <body>
+
+<section id="loading" class="screen on plain"><div class="spin"></div><div class="sub" style="text-align:center" id="loadMsg">กำลังโหลด…</div></section>
+
+<!-- นายทุน: กล่องของขวัญ -->
 <section id="gift" class="screen">
-<div class="tier js-tier"></div>
-<div class="script">Happy Birthday</div>
-<div class="h1">สุขสันต์วันเกิด</div>
-<div class="name">คุณ <span class="js-name">นักลงทุน</span></div>
-<p class="muted" style="max-width:360px;line-height:1.65;margin:8px 0 0">ขอบคุณที่ไว้วางใจลงทุนจำนอง-ขายฝากกับ Land for Loan เพื่อเป็นการตอบแทน Land for Loan ขอมอบ Voucher เป็นของขวัญวันเกิด สำหรับคนพิเศษที่ร่วมลงทุนกับเรา</p>
-<div class="stage" id="stage">
-<div class="glow"></div><div class="flash"></div>
-<button class="gift" id="giftBtn" aria-label="แตะเพื่อเปิดกล่องของขวัญ">
-<div class="giftInner">
-<svg style="position:absolute;left:25px;top:98px" width="180" height="130" viewBox="0 0 180 130" aria-hidden="true">
-<ellipse cx="90" cy="126" rx="76" ry="5" fill="#000" opacity=".15"/>
-<rect x="8" y="4" width="164" height="118" rx="10" style="fill:var(--box)"/>
-<rect x="76" y="4" width="28" height="118" style="fill:var(--ribbon)"/>
-<circle cx="34" cy="40" r="5" fill="#fff" opacity=".5"/><circle cx="146" cy="76" r="5" fill="#fff" opacity=".5"/><circle cx="40" cy="96" r="4" fill="#fff" opacity=".5"/>
-</svg>
-<svg class="lid" style="position:absolute;left:13px;top:30px;transform-origin:50% 100%" width="204" height="84" viewBox="0 0 204 84" aria-hidden="true">
-<path d="M102 36 C74 -8 28 0 42 28 C50 44 84 42 102 36 Z" style="fill:var(--ribbon);stroke:var(--ribbonDark)" stroke-width="2"/>
-<path d="M102 36 C130 -8 176 0 162 28 C154 44 120 42 102 36 Z" style="fill:var(--ribbon);stroke:var(--ribbonDark)" stroke-width="2"/>
-<rect x="4" y="38" width="196" height="44" rx="10" style="fill:var(--lid)"/>
-<rect x="88" y="38" width="28" height="44" style="fill:var(--ribbon)"/>
-<circle cx="102" cy="36" r="13" style="fill:var(--ribbon);stroke:var(--ribbonDark)" stroke-width="2"/>
-</svg>
-</div>
-</button>
-</div>
-<div class="muted" id="giftHint">แตะที่กล่องเพื่อเปิดของขวัญ</div>
-<button class="btn" id="openBtn">เปิดของขวัญ</button>
+  <div class="tier js-tier"></div>
+  <div class="script">Happy Birthday</div>
+  <div class="h1">สุขสันต์วันเกิด</div>
+  <div style="font-size:18px;font-weight:600">คุณ<span class="js-name"></span></div>
+  <p class="muted" style="max-width:360px;line-height:1.65;margin:8px 0 0">ขอบคุณที่ไว้วางใจลงทุนจำนอง-ขายฝากกับ Land for Loan เพื่อเป็นการตอบแทน Land for Loan ขอมอบ Voucher เป็นของขวัญวันเกิด สำหรับคนพิเศษที่ร่วมลงทุนกับเรา</p>
+  <div class="stage" id="stage">
+    <div class="glow"></div><div class="flash"></div>
+    <button class="gift" id="giftBtn" aria-label="แตะเพื่อเปิดกล่องของขวัญ">
+      <div class="giftInner">
+        <svg style="position:absolute;left:25px;top:98px" width="180" height="130" viewBox="0 0 180 130" aria-hidden="true">
+          <ellipse cx="90" cy="126" rx="76" ry="5" fill="#000" opacity=".15"/>
+          <rect x="8" y="4" width="164" height="118" rx="10" style="fill:var(--box)"/>
+          <rect x="76" y="4" width="28" height="118" style="fill:var(--ribbon)"/>
+          <circle cx="34" cy="40" r="5" fill="#fff" opacity=".5"/><circle cx="146" cy="76" r="5" fill="#fff" opacity=".5"/>
+        </svg>
+        <svg class="lid" style="position:absolute;left:13px;top:30px;transform-origin:50% 100%" width="204" height="84" viewBox="0 0 204 84" aria-hidden="true">
+          <path d="M102 36 C74 -8 28 0 42 28 C50 44 84 42 102 36 Z" style="fill:var(--ribbon);stroke:var(--ribbonDark)" stroke-width="2"/>
+          <path d="M102 36 C130 -8 176 0 162 28 C154 44 120 42 102 36 Z" style="fill:var(--ribbon);stroke:var(--ribbonDark)" stroke-width="2"/>
+          <rect x="4" y="38" width="196" height="44" rx="10" style="fill:var(--lid)"/>
+          <rect x="88" y="38" width="28" height="44" style="fill:var(--ribbon)"/>
+          <circle cx="102" cy="36" r="13" style="fill:var(--ribbon);stroke:var(--ribbonDark)" stroke-width="2"/>
+        </svg>
+      </div>
+    </button>
+  </div>
+  <div class="muted" id="giftHint">แตะที่กล่องเพื่อเปิดของขวัญ</div>
+  <button class="btn" id="openBtn">เปิดของขวัญ</button>
 </section>
+
+<!-- นายทุน: คูปองเด้งออกมา -->
 <section id="reveal" class="screen">
-<div id="confetti"></div>
-<div class="h1" style="font-size:32px">ยินดีด้วยค่ะ</div>
-<div class="muted">คุณได้รับคูปองของขวัญวันเกิด</div>
-<div class="ticket pop js-ticket"></div>
-<div style="flex:1"></div>
-<button class="btn" id="claimBtn">รับสิทธิ์</button>
+  <div id="confetti"></div>
+  <div class="h1">ยินดีด้วยค่ะ</div>
+  <div class="muted">คุณได้รับคูปองของขวัญวันเกิด</div>
+  <div class="ticket pop js-ticket"></div>
+  <div style="flex:1"></div>
+  <button class="btn" id="claimBtn">รับสิทธิ์</button>
 </section>
-<section id="wallet" class="screen">
-<h1 class="title">คูปองของฉัน</h1>
-<div id="walletList" style="display:flex;flex-direction:column;gap:14px"></div>
-<div style="flex:1"></div>
+
+<!-- นายทุน: คูปองของฉัน -->
+<section id="wallet" class="screen plain">
+  <h1 class="title">คูปองของฉัน</h1>
+  <div id="walletList" style="display:flex;flex-direction:column;gap:12px"></div>
 </section>
-<section id="detail" class="screen">
-<div class="ticket js-ticket" style="margin-top:0"></div>
-<div style="align-self:stretch;text-align:left;font-size:13px;line-height:1.7;color:var(--muted);margin-top:14px">
-<b style="color:var(--text)">เงื่อนไข</b><br>
-· ใช้ได้ 1 สิทธิ์ต่อทรัพย์ 1 ชิ้น ภายใน 60 วันนับจากวันเกิด<br>
-· สิทธิ์ถูกใช้เมื่อทำนิติกรรมทรัพย์เรียบร้อย<br>
-· ใช้ร่วมกับโปรโมชันอื่นไม่ได้ · โอนสิทธิ์ไม่ได้
-</div>
-<div style="flex:1"></div>
-<button class="btn" id="useBtn">ใช้สิทธิ์</button>
-<button class="link" data-go="wallet">กลับไปคูปองของฉัน</button>
+
+<!-- นายทุน: รายละเอียดคูปอง -->
+<section id="detail" class="screen plain">
+  <div id="detailBody" style="display:flex;flex-direction:column;gap:12px"></div>
 </section>
-<section id="redeem" class="screen">
-<h1 class="title">ใช้สิทธิ์คูปอง</h1>
-<div style="display:flex;flex-direction:column;gap:16px">
-<div><label for="date">เลือกวันที่ต้องการใช้สิทธิ์</label><input id="date" type="date"><div class="muted" style="font-size:12px;margin-top:4px">เลือกได้ตั้งแต่วันนี้ถึง <span class="js-exp"></span></div></div>
-<div><label for="asset">รหัสทรัพย์ที่สนใจ (ถ้ามี)</label><input id="asset" type="text" placeholder="เช่น #3721"></div>
-<div class="box" style="color:#4B5563">ทีมงานจะติดต่อยืนยันนัดหมายกับคุณ และสิทธิ์จะถูกใช้เมื่อทำนิติกรรมทรัพย์เรียบร้อยแล้ว</div>
-</div>
-<div style="flex:1"></div>
-<button class="btn" id="confirmBtn" style="background:#D9192B;color:#fff" disabled>ยืนยันใช้สิทธิ์</button>
-<button class="link" data-go="detail">ยกเลิก</button>
+
+<!-- นายทุน: แบบฟอร์มใช้สิทธิ์ -->
+<section id="use" class="screen plain">
+  <h1 class="title">ใช้สิทธิ์คูปอง</h1>
+  <div class="card" style="display:flex;flex-direction:column;gap:14px">
+    <div><label class="f" for="caseCode">รหัสเคสที่จะลงทุน</label><input id="caseCode" placeholder="เช่น 265208" inputmode="text"></div>
+    <div><label class="f" for="date">วันนัดทำนิติกรรม</label><input id="date" type="date"></div>
+    <div><span class="f" style="font-weight:700;display:block;margin-bottom:6px">ใครไปทำนิติกรรม</span>
+      <div class="seg"><button id="mSelf" aria-pressed="true">ไปเอง</button><button id="mPoa" aria-pressed="false">มอบอำนาจ</button></div></div>
+    <div id="proxyWrap" hidden><label class="f" for="proxyName">ชื่อผู้รับมอบอำนาจ</label><input id="proxyName" placeholder="ชื่อ-นามสกุล"></div>
+  </div>
+  <div class="sub">กดยืนยันแล้ว ระบบจะแจ้งทีมนิติกรรม และให้ QR สำหรับยืนยันสิทธิ์ที่หน้างาน</div>
+  <button class="btn" id="useSubmit">ยืนยันใช้สิทธิ์</button>
+  <button class="link" id="useBack">ยกเลิก</button>
 </section>
+
+<!-- นิติกรรม: สแกน QR -->
+<section id="scan" class="screen plain">
+  <div id="scanBody" style="display:flex;flex-direction:column;gap:12px"></div>
+</section>
+
+<!-- นิติกรรม: ลงทะเบียน -->
+<section id="register" class="screen plain">
+  <h1 class="title">ลงทะเบียนเจ้าหน้าที่นิติกรรม</h1>
+  <div id="regBody" style="display:flex;flex-direction:column;gap:12px"></div>
+</section>
+
+<!-- ผู้ดูแล -->
+<section id="admin" class="screen plain">
+  <h1 class="title">ผู้ดูแลระบบ Voucher (ทดสอบ)</h1>
+  <div id="adminBody" style="display:flex;flex-direction:column;gap:12px"></div>
+</section>
+
+<section id="error" class="screen plain"><div class="banner b-red" id="errMsg"></div><button class="btn alt" onclick="location.reload()">ลองใหม่</button></section>
+
 <div class="toast" id="toast"></div>
+
 <script>
 const LIFF_ID = '2012219844-0WR53piV';
+const API = 'https://n8n.srv1926160.hstgr.cloud/webhook/lfl-voucher-test';
+const THEME = {
+  gold:{},
+  platinum:{'--bg':'#EEF2F7','--circle':'#DDE5EF','--text':'#1A2433','--muted':'#5B6B7D','--head':'#1E3A5F','--script':'#5E728B','--accent':'#1E3A5F','--pill':'#1E3A5F','--pillText':'#fff','--btn':'#1E3A5F','--box':'#1E3A5F','--lid':'#152B47','--ribbon':'#D5DDE7','--ribbonDark':'#7D8DA1','--cardText':'#1A2433','--cardMuted':'#5B6B7D','--num':'#1E3A5F','--dash':'#CBD5E1'},
+  diamond:{'--bg':'#0E1A2B','--circle':'#15263D','--text':'#F5EEDF','--muted':'#B9C3CF','--head':'#E9C46A','--script':'#E2C275','--accent':'#E2C275','--pill':'#E2C275','--pillText':'#0E1A2B','--btn':'#E2C275','--btnText':'#0E1A2B','--box':'#D4A63E','--lid':'#B88A2C','--ribbon':'#D9192B','--ribbonDark':'#8E0E1A','--card':'#15263D','--cardText':'#F5EEDF','--cardMuted':'#B9C3CF','--num':'#E9C46A','--dash':'#3A5070'}
+};
+const TCOL = {gold:'#D9192B',platinum:'#1E3A5F',diamond:'#B8892E'};
+const CF = {gold:['#D9192B','#D4A63E','#F6D77E','#B3121F','#fff'],platinum:['#1E3A5F','#A9B6C6','#D5DDE7','#D9192B','#fff'],diamond:['#E9C46A','#D4A63E','#F5EEDF','#D9192B','#fff']};
+const RL = r => ({legal:'นิติกรรม',owner:'ผู้ดูแล',admin:'แอดมิน'})[r] || r;
+const ST = {issued:'ยังไม่ได้รับสิทธิ์',claimed:'พร้อมใช้',requested:'รอยืนยันที่หน้างาน',used:'ใช้สิทธิ์แล้ว',cancelled:'ยกเลิก'};
+
+const DEMO = (() => { try { return window.parent !== window && window.parent.DEMO ? window.parent.DEMO : null; } catch (e) { return null; } })();
+let qs = new URLSearchParams(window.__Q || location.search);
+function readQs(){ const s = new URLSearchParams(window.__Q || location.search); const st = s.get('liff.state'); if (st) { const inner = new URLSearchParams(st.replace(/^[^?]*\?/, '')); inner.forEach((v, k) => s.set(k, v)); } return s; }
+/* ---------- โหมดเดโมในเครื่อง (?demo=1): ไม่ต้องมีเซิร์ฟเวอร์ เก็บข้อมูลในเครื่องนี้ ---------- */
+const LOCAL = { on: false, me: null, S: null,
+  load(){ try { this.S = JSON.parse(localStorage.getItem('lfl-hbd-demo')) || {}; } catch (e) { this.S = {}; } },
+  save(){ try { localStorage.setItem('lfl-hbd-demo', JSON.stringify(this.S)); } catch (e) {} },
+  call(action, data){
+    const S = this.S, P = Object.assign({ action }, data || {});
+    if ((action === 'view' || action === 'confirm') && !(S.coupons && S.coupons[P.code]) && qs.get('tier')) {
+      S.coupons = S.coupons || {};
+      const now = new Date();
+      S.coupons[P.code] = { code: P.code, uid: 'investor', name: qs.get('n') || 'นายทุน', tier: qs.get('tier'), year: now.getFullYear(), status: 'requested', token: P.t, issuedAt: now.toISOString(), expiresAt: new Date(now.getTime() + 60*864e5).toISOString(), scans: [] };
+    }
+    const out = ROUTER(() => S, () => ({ first: () => ({ json: { p: P } }) }), { sub: this.me.id, name: this.me.name });
+    if (S.pins) Object.keys(S.pins).forEach(k => S.pins[k] = '1234');
+    this.save();
+    return Promise.resolve(JSON.parse(JSON.stringify(out[0].json.reply)));
+  },
+  ensureCoupon(){
+    const S = this.S; S.coupons = S.coupons || {};
+    if (Object.values(S.coupons).some(c => c.uid === this.me.id)) return;
+    const now = new Date(), tier = ['gold','platinum','diamond'].includes(qs.get('tier')) ? qs.get('tier') : 'diamond';
+    const code = 'HBD-' + String(now.getFullYear() + 543).slice(2) + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(1000 + Math.floor(Math.random() * 9000));
+    S.coupons[code] = { code, uid: this.me.id, name: qs.get('name') || this.me.name, tier, year: now.getFullYear(), status: 'issued', issuedAt: now.toISOString(), expiresAt: new Date(now.getTime() + 60*864e5).toISOString(), scans: [] };
+    this.save();
+  }
+};
+function ROUTER($getWorkflowStaticData, $, $json) {
+// ===== ระบบคูปองวันเกิด (ทดสอบใน Test Nan) =====
+const OWNER = 'U3c8b0f04d244f086beaa62842ec878cf';   // ผู้ดูแลสูงสุด (N.)
+const LIFF = 'https://liff.line.me/2012219844-0WR53piV';
+const ASSET = 'https://palinstation-wq.github.io/lfl-birthday-voucher/';
 const VALID_DAYS = 60;
 const TIERS = {
-gold:{name:'GOLD INVESTOR',short:'GOLD',amount:'5,000',v:{}},
-platinum:{name:'PLATINUM INVESTOR',short:'PLATINUM',amount:'7,000',v:{'--bg':'#EEF2F7','--circle':'#DDE5EF','--text':'#1A2433','--muted':'#5B6B7D','--head':'#1E3A5F','--script':'#5E728B','--accent':'#1E3A5F','--pill':'#1E3A5F','--pillText':'#fff','--btn':'#1E3A5F','--box':'#1E3A5F','--lid':'#152B47','--ribbon':'#D5DDE7','--ribbonDark':'#7D8DA1','--cardText':'#1A2433','--cardMuted':'#5B6B7D','--num':'#1E3A5F','--dash':'#CBD5E1'}},
-diamond:{name:'DIAMOND INVESTOR',short:'DIAMOND',amount:'10,000',v:{'--bg':'#0E1A2B','--circle':'#15263D','--text':'#F5EEDF','--muted':'#B9C3CF','--head':'#E9C46A','--script':'#E2C275','--accent':'#E2C275','--pill':'#E2C275','--pillText':'#0E1A2B','--btn':'#E2C275','--btnText':'#0E1A2B','--box':'#D4A63E','--lid':'#B88A2C','--ribbon':'#D9192B','--ribbonDark':'#8E0E1A','--card':'#15263D','--cardText':'#F5EEDF','--cardMuted':'#B9C3CF','--num':'#E9C46A','--dash':'#3A5070'}}
+  gold:     { label: 'GOLD INVESTOR',     amount: 5000,  head: '#D9192B', accent: '#8A6A22', btn: '#D9192B' },
+  platinum: { label: 'PLATINUM INVESTOR', amount: 7000,  head: '#1E3A5F', accent: '#1E3A5F', btn: '#1E3A5F' },
+  diamond:  { label: 'DIAMOND INVESTOR',  amount: 10000, head: '#B3121F', accent: '#8A6A22', btn: '#0E1A2B' }
 };
-const CF = {gold:['#D9192B','#D4A63E','#F6D77E','#B3121F','#fff'],platinum:['#1E3A5F','#A9B6C6','#D5DDE7','#D9192B','#fff'],diamond:['#E9C46A','#D4A63E','#F5EEDF','#D9192B','#fff']};
-const qs = new URLSearchParams(location.search);
-const tierKey = TIERS[qs.get('tier')] ? qs.get('tier') : 'gold';
-const T = TIERS[tierKey];
-Object.entries(T.v).forEach(([k,v]) => document.documentElement.style.setProperty(k,v));
-const $ = (s) => document.querySelector(s);
-const fmt = (d) => d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric'});
-const iso = (d) => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-let userId = 'demo';
-const KEY = () => 'lfl-hbd-' + userId + '-' + tierKey;
-function load(){ try{ return JSON.parse(localStorage.getItem(KEY())) || null; }catch(e){ return null; } }
-function save(s){ try{ localStorage.setItem(KEY(), JSON.stringify(s)); }catch(e){} }
-let S = null;
-function show(id){
-document.querySelectorAll('.screen').forEach(el => el.classList.toggle('on', el.id === id));
-window.scrollTo(0,0);
+// เจ้าหน้าที่นิติกรรมที่ล็อกไว้ (ฟ้ามี 2 LINE)
+const SEATS = [
+  { key: 'arm', name: 'กรกช จันทร์นวล (อาร์ม)', max: 1 },
+  { key: 'koy', name: 'นิรมล นุชทอง (ก้อย)', max: 1 },
+  { key: 'su',  name: 'สุวรรณี เคนสีแก้ว (สุ)', max: 1 },
+  { key: 'fa',  name: 'กชกานต์ ปิ่นจันทร์ (ฟ้า)', max: 2 }
+];
+// =================================================
+
+const S = $getWorkflowStaticData('global');
+S.coupons = S.coupons || {};
+S.staff = S.staff || {};
+S.log = S.log || [];
+S.pins = S.pins || {};
+S.tries = S.tries || {};
+SEATS.forEach(s => { if (!S.pins[s.key]) S.pins[s.key] = String(1000 + Math.floor(Math.random() * 9000)); });
+
+const p = $('อ่านคำขอ').first().json.p || {};
+const v = $json || {};
+const pushes = [];
+const done = (reply) => [{ json: { reply, pushes } }];
+const fail = (error, msg) => done({ ok: false, error, msg });
+
+if (!v.sub) return fail('auth', 'ยืนยันตัวตน LINE ไม่สำเร็จ ปิดหน้านี้แล้วเปิดลิงก์ใหม่อีกครั้ง');
+const me = { id: v.sub, name: v.name || 'ผู้ใช้ LINE' };
+
+const now = new Date();
+const nowIso = now.toISOString();
+const th = (iso) => { if (!iso) return '-'; const d = new Date(iso); return d.toLocaleString('th-TH', { timeZone: 'Asia/Bangkok', day: 'numeric', month: 'short', year: '2-digit', hour: '2-digit', minute: '2-digit' }) + ' น.'; };
+const thDate = (iso) => { if (!iso) return '-'; const d = new Date(iso.length === 10 ? iso + 'T00:00:00+07:00' : iso); return d.toLocaleDateString('th-TH', { timeZone: 'Asia/Bangkok', day: 'numeric', month: 'short', year: 'numeric' }); };
+const baht = (n) => Number(n).toLocaleString('en-US');
+const rand = (n, set = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789') => Array.from({ length: n }, () => set[Math.floor(Math.random() * set.length)]).join('');
+const staffOf = (id) => S.staff[id] && S.staff[id].status === 'approved' ? S.staff[id] : null;
+const roleOf = (id) => id === OWNER ? 'owner' : (staffOf(id) ? staffOf(id).role : null);
+const myRole = roleOf(me.id);
+const log = (what, code) => { S.log.unshift({ at: nowIso, by: me.id, byName: (staffOf(me.id) || {}).name || me.name, role: myRole || 'คนนอก', what, code: code || '' }); S.log = S.log.slice(0, 300); };
+const push = (to, messages) => pushes.push({ to, messages: Array.isArray(messages) ? messages : [messages] });
+const text = (t) => ({ type: 'text', text: t });
+const legalIds = () => Object.entries(S.staff).filter(([, s]) => s.status === 'approved' && s.role === 'legal').map(([id]) => id);
+const pub = (c, full) => {
+  const T = TIERS[c.tier];
+  const o = { code: c.code, tier: c.tier, tierLabel: T.label, amount: T.amount, status: c.status, investorName: c.name, issuedAt: c.issuedAt, expiresAt: c.expiresAt, claimedAt: c.claimedAt || null };
+  if (full) Object.assign(o, { req: c.req || null, token: c.uid === me.id ? (c.token || null) : undefined, usedAt: c.usedAt || null, usedByName: c.usedByName || null, scans: (c.scans || []).slice(0, 10) });
+  return o;
+};
+const qrUrl = (c) => LIFF + '?view=scan&c=' + encodeURIComponent(c.code) + '&t=' + c.token;
+const row = (k, val, bold) => ({ type: 'box', layout: 'baseline', spacing: 'sm', contents: [
+  { type: 'text', text: k, size: 'sm', color: '#8A7F7F', flex: 3 },
+  { type: 'text', text: String(val || '-'), size: 'sm', color: '#2B1B1B', flex: 5, wrap: true, weight: bold ? 'bold' : 'regular' } ] });
+const receiptFlex = (c, title) => {
+  const T = TIERS[c.tier];
+  return { type: 'flex', altText: title + ' · ' + c.code, contents: { type: 'bubble', size: 'mega',
+    header: { type: 'box', layout: 'vertical', backgroundColor: '#15803D', paddingAll: '16px', contents: [
+      { type: 'text', text: '✅ ' + title, color: '#FFFFFF', weight: 'bold', size: 'lg' },
+      { type: 'text', text: th(c.usedAt), color: '#DCFCE7', size: 'xs' } ] },
+    body: { type: 'box', layout: 'vertical', spacing: 'sm', paddingAll: '16px', contents: [
+      row('นายทุน', c.name, true), row('คูปอง', c.code), row('ระดับ / ส่วนลด', T.label.replace(' INVESTOR', '') + ' · ' + baht(T.amount) + ' บาท', true),
+      row('เคส', c.req && c.req.caseCode), row('วันที่ทำ', c.req && thDate(c.req.date)),
+      row('ผู้มาทำนิติกรรม', c.req ? (c.req.mode === 'poa' ? 'ผู้รับมอบอำนาจ: ' + (c.req.proxyName || '-') : 'นายทุนมาเอง') : '-'),
+      row('ยืนยันโดย', c.usedByName, true), row('สถานะ', 'ใช้สิทธิ์แล้ว · ใช้ซ้ำไม่ได้') ] } } };
+};
+const giftFlex = (c) => {
+  const T = TIERS[c.tier];
+  const uri = LIFF + '?view=gift&c=' + encodeURIComponent(c.code);
+  return { type: 'flex', altText: '🎁 มีของขวัญวันเกิดรอคุณอยู่ จาก Land for Loan', contents: { type: 'bubble', size: 'mega',
+    hero: { type: 'image', url: ASSET + 'gift-animated.png', size: 'full', aspectRatio: '1:1', aspectMode: 'cover', animated: true, action: { type: 'uri', uri } },
+    body: { type: 'box', layout: 'vertical', spacing: 'sm', paddingAll: '20px', backgroundColor: '#FFF5E8', contents: [
+      { type: 'text', text: T.label, size: 'xs', weight: 'bold', color: T.accent },
+      { type: 'text', text: 'สุขสันต์วันเกิด คุณ' + c.name, size: 'xl', weight: 'bold', color: T.head, wrap: true },
+      { type: 'text', wrap: true, size: 'sm', color: '#6E5C5C', margin: 'md', text: 'ขอบคุณที่ไว้วางใจลงทุนจำนอง-ขายฝากกับ Land for Loan เราขอมอบ Voucher ส่วนลด ' + baht(T.amount) + ' บาท เป็นของขวัญวันเกิดสำหรับคนพิเศษ' } ] },
+    footer: { type: 'box', layout: 'vertical', paddingAll: '14px', backgroundColor: '#FFF5E8', contents: [
+      { type: 'button', style: 'primary', color: T.btn, height: 'md', action: { type: 'uri', label: '🎁 แตะเพื่อรับสิทธิ์', uri } } ] } } };
+};
+const getCoupon = (code) => S.coupons[String(code || '').toUpperCase()];
+
+const a = p.action;
+
+// ---------- ทุกคน ----------
+if (a === 'me') {
+  const mine = Object.values(S.coupons).filter(c => c.uid === me.id).sort((x, y) => y.issuedAt.localeCompare(x.issuedAt)).map(c => pub(c, true));
+  return done({ ok: true, me: { id: me.id, name: me.name, role: myRole, staff: S.staff[me.id] || null }, coupons: mine });
 }
-function toast(msg){ const t=$('#toast'); t.textContent=msg; t.style.display='block'; setTimeout(()=>t.style.display='none',1800); }
-function ticketHTML(){
-const exp = fmt(new Date(S.expiresAt));
-return '<div class="tTop"><div class="pill">'+T.name+'</div>'+
-'<div style="font-size:15px;margin-top:8px;color:var(--cardMuted)">ของขวัญวันเกิด · ส่วนลด</div>'+
-'<div style="display:flex;align-items:baseline;gap:8px"><div class="amt">'+T.amount+'</div><div style="font-size:20px;font-weight:700;color:var(--num)">บาท</div></div>'+
-'<div style="font-size:15px;font-weight:600;color:var(--cardText)">เมื่อลงทุนทรัพย์ 1 ชิ้น</div></div>'+
-'<div class="perf"></div>'+
-'<div class="tBot"><div>รหัส<br><b>'+S.code+'</b></div><div style="text-align:right">ใช้ได้ถึง<br><b>'+exp+'</b></div></div>';
+
+if (a === 'bind') {
+  if (S.staff[me.id]) return done({ ok: true, staff: S.staff[me.id] });
+  const seat = SEATS.find(x => x.key === p.seat);
+  if (!seat) return fail('input', 'เลือกชื่อของคุณ');
+  const t = S.tries[me.id] = S.tries[me.id] || { n: 0 };
+  if (t.n >= 5) return fail('locked', 'ใส่รหัสผิดเกิน 5 ครั้ง บัญชี LINE นี้ถูกล็อก ติดต่อผู้ดูแล');
+  if (String(p.pin || '') !== S.pins[seat.key]) {
+    t.n++;
+    log('ใส่รหัสเชื่อม LINE ผิด (' + seat.name + ') ครั้งที่ ' + t.n);
+    if (t.n >= 3) push(OWNER, text('⚠️ มีคนพยายามเชื่อม LINE เป็น ' + seat.name + ' แต่ใส่รหัสผิด ' + t.n + ' ครั้ง\nLINE: ' + me.name + '\nเวลา: ' + th(nowIso)));
+    return fail('pin', 'รหัสไม่ถูกต้อง (เหลืออีก ' + (5 - t.n) + ' ครั้ง)');
+  }
+  const used = Object.values(S.staff).filter(x => x.seat === seat.key).length;
+  if (used >= seat.max) {
+    push(OWNER, text('⚠️ มีคนพยายามเชื่อม LINE เป็น ' + seat.name + ' แต่ชื่อนี้เชื่อมครบแล้ว\nLINE: ' + me.name + '\nเวลา: ' + th(nowIso)));
+    return fail('full', 'ชื่อนี้เชื่อม LINE ครบแล้ว ถ้าเปลี่ยนเครื่องหรือ LINE ให้ผู้ดูแลปลดการเชื่อมก่อน');
+  }
+  S.staff[me.id] = { name: seat.name, seat: seat.key, lineName: me.name, role: 'legal', status: 'approved', at: nowIso };
+  log('เชื่อม LINE เป็นนิติกรรม: ' + seat.name);
+  push(OWNER, text('🔗 ' + seat.name + ' เชื่อม LINE แล้ว\nLINE: ' + me.name + '\nเวลา: ' + th(nowIso)));
+  push(me.id, text('✅ เชื่อม LINE กับระบบ Voucher วันเกิดแล้ว (' + seat.name + ')\nครั้งต่อไปสแกน QR ของนายทุนแล้วยืนยันสิทธิ์ได้ทันที'));
+  return done({ ok: true, staff: S.staff[me.id] });
 }
-function renderAll(){
-document.querySelectorAll('.js-tier').forEach(e=>e.textContent=T.name);
-document.querySelectorAll('.js-ticket').forEach(e=>e.innerHTML=ticketHTML());
-document.querySelectorAll('.js-exp').forEach(e=>e.textContent=fmt(new Date(S.expiresAt)));
-const st = {claimed:['พร้อมใช้','#DCFCE7','#166534'],requested:['รอแอดมินยืนยัน','#FEF3C7','#92400E'],used:['ใช้สิทธิ์แล้ว','#E5E7EB','#374151']}[S.status];
-const list = $('#walletList');
-if (S.status === 'new') {
-list.innerHTML = '<div class="box" style="text-align:center;padding:28px 18px"><b>ยังไม่มีคูปองที่รับไว้</b><br><span style="color:#4B5563">มีของขวัญวันเกิดรอให้เปิดอยู่</span><br><button class="btn" style="margin-top:12px" data-go="gift">เปิดของขวัญ</button></div>';
-} else {
-list.innerHTML =
-'<button class="row" data-go="detail"><div class="rowL"><div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--accent)">'+T.short+'</div><div class="a">'+T.amount+'</div><div style="font-size:12px;color:var(--num)">บาท</div></div>'+
-'<div style="flex:1;padding:14px;display:flex;flex-direction:column;gap:4px"><div style="font-size:16px;font-weight:700">ของขวัญวันเกิด</div><div style="font-size:13px;color:#4B5563">ส่วนลดเมื่อลงทุนทรัพย์ 1 ชิ้น</div><div style="font-size:13px;color:#4B5563">ใช้ได้ถึง '+fmt(new Date(S.expiresAt))+'</div>'+
-'<div class="status" style="background:'+st[1]+';color:'+st[2]+'">'+st[0]+'</div></div></button>'+
-(S.status==='requested' ? '<div class="box"><b>นัดใช้สิทธิ์วันที่ '+fmt(new Date(S.redeemDate+'T00:00:00'))+'</b>'+(S.asset?' · ทรัพย์ '+S.asset:'')+'<br><span style="color:#4B5563">ทีมงานจะติดต่อยืนยันกับคุณก่อนวันนัด</span></div>' : '');
+
+if (a === 'claim') {
+  const c = getCoupon(p.code);
+  if (!c || c.uid !== me.id) return fail('notfound', 'ไม่พบคูปองนี้ในบัญชี LINE ของคุณ');
+  if (c.status === 'issued') { c.status = 'claimed'; c.claimedAt = nowIso; log('รับสิทธิ์', c.code); }
+  return done({ ok: true, coupon: pub(c, true) });
 }
-const use = $('#useBtn');
-use.disabled = S.status !== 'claimed';
-use.textContent = S.status==='requested' ? 'รอแอดมินยืนยัน' : S.status==='used' ? 'ใช้สิทธิ์แล้ว' : 'ใช้สิทธิ์';
-$('#claimBtn').disabled = S.status !== 'new';
-$('#claimBtn').textContent = S.status === 'new' ? 'รับสิทธิ์' : 'รับสิทธิ์แล้ว';
+
+if (a === 'use') {
+  const c = getCoupon(p.code);
+  if (!c || c.uid !== me.id) return fail('notfound', 'ไม่พบคูปองนี้ในบัญชี LINE ของคุณ');
+  if (c.status === 'used') return fail('used', 'คูปองนี้ใช้สิทธิ์ไปแล้ว');
+  if (c.status === 'cancelled') return fail('cancelled', 'คูปองนี้ถูกยกเลิกแล้ว');
+  if (new Date(c.expiresAt) < now) return fail('expired', 'คูปองหมดอายุแล้ว');
+  if (c.status !== 'requested') { c.status = 'requested'; c.token = rand(10); c.req = null; log('เปิด QR ใช้สิทธิ์', c.code); }
+  const ids = legalIds();
+  return done({ ok: true, coupon: pub(c, true), qr: qrUrl(c), notified: ids.length });
 }
-document.addEventListener('click', (e) => {
-const g = e.target.closest('[data-go]'); if (g) show(g.dataset.go);
-});
+
+if (a === 'cancelUse') {
+  const c = getCoupon(p.code);
+  if (!c || c.uid !== me.id) return fail('notfound', 'ไม่พบคูปองนี้');
+  if (c.status !== 'requested') return fail('state', 'ยกเลิกได้เฉพาะคูปองที่รอใช้สิทธิ์');
+  c.status = 'claimed'; c.token = null; log('นายทุนยกเลิกคำขอใช้สิทธิ์ เคส ' + (c.req && c.req.caseCode), c.code); c.req = null;
+  return done({ ok: true, coupon: pub(c, true) });
+}
+
+// ---------- สแกน QR ----------
+if (a === 'view' || a === 'confirm') {
+  const c = getCoupon(p.code);
+  if (!c) return fail('notfound', 'ไม่พบคูปองนี้ในระบบ');
+  c.scans = c.scans || [];
+  if (a === 'view') {
+    c.scans.unshift({ at: nowIso, by: me.id, name: (staffOf(me.id) || {}).name || me.name, role: myRole || 'คนนอก' });
+    c.scans = c.scans.slice(0, 30);
+    log('สแกน QR', c.code);
+  }
+  const T = TIERS[c.tier];
+  if (!myRole) {
+    if (a === 'view') push(OWNER, text('👀 มี LINE ที่ยังไม่ได้เชื่อมเป็นนิติกรรม สแกน QR คูปอง ' + c.code + '\nLINE: ' + me.name + '\nเวลา: ' + th(nowIso) + '\nยังยืนยันสิทธิ์ไม่ได้จนกว่าจะเชื่อม LINE ด้วยรหัส'));
+    return done({ ok: true, limited: true, role: null, coupon: { code: c.code, tierLabel: T.label, status: c.status },
+      msg: 'คูปองนี้สำหรับเจ้าหน้าที่นิติกรรม Land for Loan เท่านั้น', canBind: true,
+      seats: SEATS.map(s => ({ key: s.key, name: s.name, full: Object.values(S.staff).filter(x => x.seat === s.key).length >= s.max })) });
+  }
+  const tokenOk = c.token && p.t === c.token;
+  const base = { ok: true, role: myRole, canConfirm: myRole === 'legal', coupon: Object.assign(pub(c, true), { token: undefined }), tokenOk };
+  if (a === 'view') return done(base);
+  // confirm
+  if (myRole !== 'legal') return fail('role', 'ปุ่มยืนยันสิทธิ์ใช้ได้เฉพาะนิติกรรม');
+  if (c.status === 'used') return done({ ok: false, error: 'used', msg: 'คูปองนี้ใช้สิทธิ์ไปแล้วเมื่อ ' + th(c.usedAt) + ' โดย ' + c.usedByName, coupon: base.coupon });
+  if (c.status !== 'requested') return fail('state', 'นายทุนยังไม่ได้กดใช้สิทธิ์ หรือยกเลิกคำขอแล้ว');
+  if (!tokenOk) return fail('qr_old', 'QR นี้เป็นรุ่นเก่า ให้นายทุนเปิด QR ล่าสุดในคูปองของฉัน');
+  if (new Date(c.expiresAt) < now) return fail('expired', 'คูปองหมดอายุแล้ว');
+  const caseCode = String(p.caseCode || '').trim().slice(0, 30);
+  if (!caseCode) return fail('input', 'กรอกรหัสเคสที่ทำนิติกรรม');
+  const mode = p.mode === 'poa' ? 'poa' : 'self';
+  const proxyName = mode === 'poa' ? String(p.proxyName || '').trim().slice(0, 80) : '';
+  if (mode === 'poa' && !proxyName) return fail('input', 'กรอกชื่อผู้รับมอบอำนาจ');
+  c.req = { caseCode, date: nowIso.slice(0, 10), mode, proxyName };
+  c.status = 'used'; c.usedAt = nowIso; c.usedBy = me.id; c.usedByName = staffOf(me.id).name; c.token = null;
+  log('ยืนยันสิทธิ์ เคส ' + (c.req && c.req.caseCode), c.code);
+  push(c.uid, receiptFlex(c, 'ใช้สิทธิ์ Voucher เรียบร้อย'));
+  push(me.id, receiptFlex(c, 'ยืนยันสิทธิ์สำเร็จ'));
+  if (OWNER !== c.uid && OWNER !== me.id) push(OWNER, receiptFlex(c, 'มีการใช้สิทธิ์ Voucher'));
+  return done({ ok: true, role: myRole, coupon: Object.assign(pub(c, true), { token: undefined }), confirmed: true });
+}
+
+// ---------- ผู้ดูแลสูงสุด ----------
+if (myRole !== 'owner') return fail('role', 'ทำรายการนี้ได้เฉพาะผู้ดูแลสูงสุด');
+
+if (a === 'admin') {
+  return done({ ok: true,
+    seats: SEATS.map(s => ({ key: s.key, name: s.name, max: s.max, pin: S.pins[s.key],
+      lines: Object.entries(S.staff).filter(([, x]) => x.seat === s.key).map(([id, x]) => ({ id, lineName: x.lineName, at: x.at })) })),
+    coupons: Object.values(S.coupons).sort((x, y) => y.issuedAt.localeCompare(x.issuedAt)).map(c => Object.assign(pub(c, true), { token: undefined, uid: c.uid })),
+    log: S.log.slice(0, 60) });
+}
+
+if (a === 'unbind') {
+  const s = S.staff[p.uid];
+  if (!s) return fail('notfound', 'ไม่พบการเชื่อมนี้');
+  delete S.staff[p.uid];
+  log('ปลดการเชื่อม LINE ของ ' + s.name + ' (' + s.lineName + ')');
+  push(p.uid, text('ℹ️ LINE นี้ถูกปลดออกจากระบบ Voucher วันเกิดแล้ว'));
+  return done({ ok: true });
+}
+
+if (a === 'newPin') {
+  const seat = SEATS.find(x => x.key === p.seat);
+  if (!seat) return fail('input', 'ไม่พบชื่อนี้');
+  S.pins[seat.key] = String(1000 + Math.floor(Math.random() * 9000));
+  log('ออกรหัสเชื่อม LINE ใหม่ให้ ' + seat.name);
+  return done({ ok: true });
+}
+
+if (a === 'issue') {
+  const tier = TIERS[p.tier] ? p.tier : 'gold';
+  const to = p.to || me.id;
+  const name = String(p.name || me.name).trim().slice(0, 60);
+  const yr = now.getFullYear();
+  const dup = Object.values(S.coupons).find(c => c.uid === to && c.year === yr && c.status !== 'cancelled');
+  if (dup) return fail('dup', 'บัญชีนี้มีคูปองวันเกิดปีนี้แล้ว (' + dup.code + ') กด "ล้างข้อมูลทดสอบ" ก่อนถ้าจะทดสอบใหม่');
+  const yymm = String(yr + 543).slice(2) + String(now.getMonth() + 1).padStart(2, '0');
+  let code; do { code = 'HBD-' + yymm + '-' + rand(4, '0123456789'); } while (S.coupons[code]);
+  const c = { code, uid: to, name, tier, year: yr, status: 'issued', issuedAt: nowIso, expiresAt: new Date(now.getTime() + VALID_DAYS * 864e5).toISOString(), scans: [] };
+  S.coupons[code] = c;
+  log('ออกคูปอง ' + tier.toUpperCase() + ' ให้ ' + name, code);
+  push(to, giftFlex(c));
+  return done({ ok: true, coupon: pub(c, true) });
+}
+
+if (a === 'undo') {
+  const c = getCoupon(p.code);
+  const reason = String(p.reason || '').trim();
+  if (!c) return fail('notfound', 'ไม่พบคูปอง');
+  if (!reason) return fail('input', 'ใส่เหตุผล');
+  if (c.status !== 'used') return fail('state', 'ยกเลิกได้เฉพาะคูปองที่ใช้สิทธิ์แล้ว');
+  c.status = 'claimed'; c.undo = { at: nowIso, reason, prevBy: c.usedByName }; c.usedAt = null; c.usedBy = null; c.usedByName = null; c.req = null;
+  log('ยกเลิกการใช้สิทธิ์ · ' + reason, c.code);
+  push(c.uid, text('ℹ️ คูปอง ' + c.code + ' ถูกยกเลิกการใช้สิทธิ์ และกลับมาใช้ได้อีกครั้ง\nเหตุผล: ' + reason));
+  return done({ ok: true });
+}
+
+if (a === 'reset') {
+  S.coupons = {}; log('ล้างข้อมูลทดสอบ (คูปองทั้งหมด)');
+  return done({ ok: true });
+}
+
+return fail('action', 'ไม่รู้จักคำสั่ง ' + a);
+
+}
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const baht = n => Number(n).toLocaleString('en-US');
+const fd = iso => iso ? new Date(iso.length === 10 ? iso + 'T00:00:00' : iso).toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric'}) : '-';
+const ft = iso => iso ? new Date(iso).toLocaleString('th-TH',{day:'numeric',month:'short',year:'2-digit',hour:'2-digit',minute:'2-digit'}) + ' น.' : '-';
+const iso = d => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+let ME = null, COUPONS = [], CUR = null, mode = 'self', busy = false;
+
+function show(id){ document.querySelectorAll('.screen').forEach(el => el.classList.toggle('on', el.id === id)); window.scrollTo(0,0); }
+function toast(m){ const t=$('#toast'); t.textContent=m; t.style.display='block'; clearTimeout(toast.h); toast.h=setTimeout(()=>t.style.display='none',2600); }
+function fatal(m){ $('#errMsg').textContent = m; show('error'); }
+function theme(tier){ const root=document.documentElement; Object.keys(THEME.diamond).forEach(k=>root.style.removeProperty(k)); Object.entries(THEME[tier]||{}).forEach(([k,v])=>root.style.setProperty(k,v)); }
+
+async function api(action, data){
+  if (DEMO) return DEMO.call(qs.get('as'), action, data);
+  if (LOCAL.on) return LOCAL.call(action, data);
+  const idToken = liff.getIDToken();
+  const body = new URLSearchParams({ p: JSON.stringify(Object.assign({ action, idToken }, data || {})) });
+  const r = await fetch(API, { method:'POST', body });
+  if (!r.ok) throw new Error('เซิร์ฟเวอร์ตอบกลับผิดพลาด (' + r.status + ')');
+  return r.json();
+}
+async function act(btn, action, data){
+  if (busy) return null; busy = true; if (btn) { btn.disabled = true; btn.dataset.t = btn.textContent; btn.textContent = 'กำลังบันทึก…'; }
+  try { const r = await api(action, data); if (!r.ok) toast(r.msg || 'ทำรายการไม่สำเร็จ'); return r; }
+  catch(e){ toast(e.message); return null; }
+  finally { busy = false; if (btn) { btn.disabled = false; btn.textContent = btn.dataset.t; } }
+}
+
+function ticket(c){
+  return '<div class="tTop"><div class="pill">'+esc(c.tierLabel)+'</div>'+
+    '<div style="font-size:15px;margin-top:8px;color:var(--cardMuted)">ของขวัญวันเกิด · ส่วนลด</div>'+
+    '<div style="display:flex;align-items:baseline;gap:8px;justify-content:center"><div class="amt">'+baht(c.amount)+'</div><div style="font-size:20px;font-weight:700;color:var(--num)">บาท</div></div>'+
+    '<div style="font-size:15px;font-weight:600;color:var(--cardText)">เมื่อลงทุนทรัพย์ 1 ชิ้น</div></div>'+
+    '<div class="perf"></div><div class="tBot"><div>รหัส<br><b>'+esc(c.code)+'</b></div><div style="text-align:right">ใช้ได้ถึง<br><b>'+fd(c.expiresAt)+'</b></div></div>';
+}
+function receipt(c, title){
+  const r = c.req || {};
+  return '<div class="rec"><div class="h"><b>✅ '+esc(title)+'</b><span>'+ft(c.usedAt)+'</span></div><div class="bd"><dl class="kv">'+
+    '<dt>นายทุน</dt><dd>'+esc(c.investorName)+'</dd><dt>คูปอง</dt><dd>'+esc(c.code)+'</dd>'+
+    '<dt>ระดับ</dt><dd>'+esc(c.tierLabel.replace(' INVESTOR',''))+' · '+baht(c.amount)+' บาท</dd>'+
+    '<dt>เคส</dt><dd>'+esc(r.caseCode||'-')+'</dd><dt>วันที่ทำ</dt><dd>'+fd(r.date)+'</dd>'+
+    '<dt>ผู้มาทำ</dt><dd>'+(r.mode==='poa'?'ผู้รับมอบอำนาจ: '+esc(r.proxyName):'นายทุนมาเอง')+'</dd>'+
+    '<dt>ยืนยันโดย</dt><dd>'+esc(c.usedByName||'-')+'</dd></dl>'+
+    '<div class="small" style="margin-top:12px">คูปองนี้ใช้แล้ว ใช้ซ้ำไม่ได้ · แคปหน้าจอนี้เก็บไว้เป็นหลักฐาน</div></div></div>';
+}
+
+/* ---------- นายทุน ---------- */
+function renderWallet(){
+  const list = $('#walletList');
+  if (!COUPONS.length) { list.innerHTML = '<div class="card" style="text-align:center">ยังไม่มีคูปองในบัญชี LINE นี้</div>'; return; }
+  list.innerHTML = COUPONS.map(c =>
+    '<button class="rowc" data-code="'+esc(c.code)+'"><div class="rowL" style="color:'+TCOL[c.tier]+'"><div style="font-size:10px;font-weight:700;letter-spacing:2px">'+esc(c.tierLabel.replace(' INVESTOR',''))+'</div><div class="a">'+baht(c.amount)+'</div><div style="font-size:12px">บาท</div></div>'+
+    '<div style="flex:1;padding:14px;display:flex;flex-direction:column;gap:2px"><div style="font-size:16px;font-weight:700">ของขวัญวันเกิด</div><div class="sub">'+esc(c.code)+' · ใช้ได้ถึง '+fd(c.expiresAt)+'</div>'+
+    (c.req && c.req.caseCode ? '<div class="sub">เคส '+esc(c.req.caseCode)+'</div>' : '')+
+    '<div><span class="st st-'+c.status+'">'+ST[c.status]+'</span></div></div></button>').join('');
+  list.querySelectorAll('[data-code]').forEach(b => b.onclick = () => openCoupon(b.dataset.code));
+}
+function openCoupon(code){
+  CUR = COUPONS.find(c => c.code === code); if (!CUR) return;
+  theme(CUR.tier);
+  if (CUR.status === 'issued') { openGiftScreen(); return; }
+  renderDetail(); show('detail');
+}
+function renderDetail(){
+  const c = CUR, b = $('#detailBody');
+  let h = '<div class="ticket" style="margin-top:0">'+ticket(c)+'</div>';
+  if (c.status === 'claimed') {
+    h += '<div class="card sub" style="line-height:1.7"><b style="color:#111827">เงื่อนไข</b><br>· ใช้ได้ 1 สิทธิ์ต่อทรัพย์ 1 ชิ้น ภายใน 60 วัน<br>· สิทธิ์ถูกใช้เมื่อเจ้าหน้าที่นิติกรรมยืนยันที่หน้างาน<br>· โอนสิทธิ์ไม่ได้</div>'+
+      '<button class="btn" id="goUse">ใช้สิทธิ์ · แสดง QR</button>';
+  } else if (c.status === 'requested') {
+    h += '<div class="banner b-blue">แสดง QR นี้ให้เจ้าหน้าที่นิติกรรมสแกน<div style="font-weight:500;font-size:14px;margin-top:4px">เจ้าหน้าที่จะใส่เคสและยืนยันสิทธิ์ให้ หลังทำนิติกรรมเสร็จ</div></div>'+
+      '<div class="qrbox"><div id="qr"></div><b>'+esc(c.code)+'</b><div class="sub" style="text-align:center">ไปเองที่หน้างาน: เปิดหน้านี้ให้เจ้าหน้าที่สแกน<br>มอบอำนาจ: 📸 แคปหน้าจอนี้ ส่งให้ผู้รับมอบอำนาจหรือเจ้าหน้าที่ทาง LINE</div></div>'+
+      '<button class="btn alt" id="cancelUse">ยกเลิกคำขอใช้สิทธิ์</button>';
+  } else if (c.status === 'used') {
+    h += receipt(c, 'ใช้สิทธิ์เรียบร้อย');
+  }
+  h += '<button class="link" id="toWallet">กลับไปคูปองของฉัน</button>';
+  b.innerHTML = h;
+  if (c.status === 'requested' && window.QRCode) new QRCode($('#qr'), { text: c.qr || (location.origin + '/'), width: 440, height: 440, correctLevel: QRCode.CorrectLevel.M });
+  const g = $('#goUse'); if (g) g.onclick = async () => { const r = await act(g, 'use', { code: c.code }); if (r && r.ok) { await reloadMe(); openCoupon(c.code); } };
+  const x = $('#cancelUse'); if (x) x.onclick = async () => { const r = await act(x, 'cancelUse', {code:c.code}); if (r && r.ok) { await reloadMe(); openCoupon(c.code); toast('ยกเลิกคำขอแล้ว'); } };
+  $('#toWallet').onclick = () => { theme('gold'); renderWallet(); show('wallet'); };
+}
+function openGiftScreen(){
+  document.querySelectorAll('.js-tier').forEach(e => e.textContent = CUR.tierLabel);
+  document.querySelectorAll('.js-name').forEach(e => e.textContent = CUR.investorName);
+  document.querySelectorAll('.js-ticket').forEach(e => e.innerHTML = ticket(CUR));
+  $('#stage').classList.remove('opening'); $('#giftHint').textContent = 'แตะที่กล่องเพื่อเปิดของขวัญ';
+  show('gift');
+}
 function openGift(){
-const st = $('#stage'); if (st.classList.contains('opening')) return;
-st.classList.add('opening'); $('#giftHint').textContent = 'กำลังเปิด...';
-setTimeout(() => {
-const box = $('#confetti'); box.innerHTML='';
-const cols = CF[tierKey];
-for (let i=0;i<40;i++){ const d=document.createElement('div'); d.className='cf';
-d.style.cssText='left:'+((i*37)%100)+'%;width:'+(6+(i%3)*3)+'px;height:'+(i%2?12:7)+'px;background:'+cols[i%cols.length]+';animation-delay:'+(((i*13)%10)/10)+'s';
-box.appendChild(d); }
-show('reveal');
-}, 1250);
+  const st = $('#stage'); if (st.classList.contains('opening')) return;
+  st.classList.add('opening'); $('#giftHint').textContent = 'กำลังเปิด...';
+  setTimeout(() => {
+    const box = $('#confetti'); box.innerHTML = ''; const cols = CF[CUR.tier];
+    for (let i=0;i<40;i++){ const d=document.createElement('div'); d.className='cf'; d.style.cssText='left:'+((i*37)%100)+'%;width:'+(6+(i%3)*3)+'px;height:'+(i%2?12:7)+'px;background:'+cols[i%cols.length]+';animation-delay:'+(((i*13)%10)/10)+'s'; box.appendChild(d); }
+    show('reveal');
+  }, 1250);
 }
 $('#giftBtn').onclick = openGift; $('#openBtn').onclick = openGift;
-$('#claimBtn').onclick = () => {
-if (S.status !== 'new') return;
-S.status='claimed'; S.claimedAt=new Date().toISOString(); save(S); renderAll();
-toast('รับสิทธิ์เรียบร้อย เก็บไว้ในคูปองของฉันแล้ว');
-setTimeout(()=>show('wallet'),1400);
+$('#claimBtn').onclick = async () => {
+  const r = await act($('#claimBtn'), 'claim', {code: CUR.code});
+  if (r && r.ok) { toast('รับสิทธิ์เรียบร้อย เก็บไว้ในคูปองของฉันแล้ว'); await reloadMe(); theme('gold'); renderWallet(); setTimeout(() => show('wallet'), 900); }
 };
-$('#useBtn').onclick = () => { if (S.status==='claimed') show('redeem'); };
-$('#date').oninput = (e) => { $('#confirmBtn').disabled = !e.target.value; };
-$('#confirmBtn').onclick = () => {
-const d = $('#date').value; if (!d) return;
-S.status='requested'; S.redeemDate=d; S.asset=$('#asset').value.trim(); save(S); renderAll();
-show('wallet');
+$('#mSelf').onclick = () => { mode='self'; $('#mSelf').setAttribute('aria-pressed','true'); $('#mPoa').setAttribute('aria-pressed','false'); $('#proxyWrap').hidden = true; };
+$('#mPoa').onclick = () => { mode='poa'; $('#mPoa').setAttribute('aria-pressed','true'); $('#mSelf').setAttribute('aria-pressed','false'); $('#proxyWrap').hidden = false; };
+$('#useBack').onclick = () => show('detail');
+$('#useSubmit').onclick = async () => {
+  const data = { code: CUR.code, caseCode: $('#caseCode').value.trim(), date: $('#date').value, mode, proxyName: $('#proxyName').value.trim() };
+  if (!data.caseCode || !data.date) { toast('กรอกรหัสเคสและวันนัด'); return; }
+  if (mode==='poa' && !data.proxyName) { toast('กรอกชื่อผู้รับมอบอำนาจ'); return; }
+  const r = await act($('#useSubmit'), 'use', data);
+  if (r && r.ok) { await reloadMe(); openCoupon(CUR.code); toast(r.notified ? 'แจ้งทีมนิติกรรมแล้ว ' + r.notified + ' คน' : 'บันทึกแล้ว (ยังไม่มีนิติกรรมที่อนุมัติในระบบ)'); }
 };
-async function start(){
-if (LIFF_ID) {
-try {
-await liff.init({ liffId: LIFF_ID });
-if (!liff.isLoggedIn()) { liff.login(); return; }
-const p = await liff.getProfile();
-userId = p.userId;
-document.querySelectorAll('.js-name').forEach(e=>e.textContent=p.displayName);
-} catch (err) { console.error(err); toast('เชื่อมต่อ LINE ไม่สำเร็จ'); }
+async function reloadMe(){
+  const r = await api('me'); if (!r.ok) throw new Error(r.msg);
+  ME = r.me; COUPONS = r.coupons.map(c => { if (c.status === 'requested' && c.token) c.qr = 'https://liff.line.me/' + LIFF_ID + '?view=scan&c=' + encodeURIComponent(c.code) + '&t=' + c.token + (LOCAL.on ? '&demo=1&tier=' + c.tier + '&n=' + encodeURIComponent(c.investorName) : ''); return c; });
 }
-const nm = qs.get('name');
-if (nm) document.querySelectorAll('.js-name').forEach(e=>e.textContent=nm);
-const today = new Date();
-S = load() || { status:'new', code:'HBD-'+iso(today).slice(2,7).replace('-','')+'-'+String(Math.floor(Math.random()*9000)+1000), issuedAt:today.toISOString(), expiresAt:new Date(today.getTime()+VALID_DAYS*86400000).toISOString() };
-save(S);
-$('#date').min = iso(today); $('#date').max = iso(new Date(S.expiresAt));
-renderAll();
-const page = qs.get('page');
-show(page==='wallet' ? 'wallet' : (S.status==='new' ? 'gift' : 'wallet'));
+
+/* ---------- นิติกรรม: สแกน ---------- */
+async function renderScan(){
+  const code = qs.get('c'), t = qs.get('t'), b = $('#scanBody');
+  const r = await api('view', { code, t });
+  if (!r.ok) { b.innerHTML = '<div class="banner b-red">'+esc(r.msg)+'</div>'; show('scan'); return; }
+  const c = r.coupon;
+  if (r.limited) {
+    let h = '<div class="banner b-grey">คูปอง '+esc(c.code)+'<div style="font-weight:500;font-size:14px;margin-top:6px">'+esc(r.msg)+'</div></div>';
+    if (r.canBind) h += '<div class="card" style="display:flex;flex-direction:column;gap:12px"><b>เจ้าหน้าที่นิติกรรม · เชื่อม LINE ครั้งแรก</b>'+
+      '<div class="sub">เลือกชื่อของคุณ แล้วใส่รหัส 4 หลักที่ได้รับจากผู้ดูแล ทำครั้งเดียว ครั้งต่อไปสแกนแล้วยืนยันได้เลย</div>'+
+      '<div style="display:grid;gap:8px">'+r.seats.map(s => '<button class="btn alt" style="min-height:44px;font-size:15px;text-align:left" data-seat="'+s.key+'" aria-pressed="false" '+(s.full?'disabled':'')+'>'+esc(s.name)+(s.full?' · เชื่อมแล้ว':'')+'</button>').join('')+'</div>'+
+      '<div><label class="f" for="pin">รหัส 4 หลัก'+(LOCAL.on?' <span class="sub">(เดโม: 1234)</span>':'')+'</label><input id="pin" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="••••"></div>'+
+      '<button class="btn" id="bindBtn">เชื่อม LINE ของฉัน</button></div>';
+    else h += '<div class="card sub">ระบบบันทึกการสแกนนี้และแจ้งผู้ดูแลแล้ว</div>';
+    h += '<div class="card sub">ถ้าคุณไม่ใช่เจ้าหน้าที่นิติกรรม ระบบบันทึกการสแกนนี้และแจ้งผู้ดูแลแล้ว</div>';
+    b.innerHTML = h; show('scan');
+    let seat = null;
+    b.querySelectorAll('[data-seat]').forEach(x => x.onclick = () => { seat = x.dataset.seat; b.querySelectorAll('[data-seat]').forEach(y => { const on = y === x; y.setAttribute('aria-pressed', on); y.style.borderColor = on ? '#111827' : ''; y.style.fontWeight = on ? '700' : ''; }); });
+    const bb = $('#bindBtn');
+    if (bb) bb.onclick = async () => {
+      if (!seat) { toast('เลือกชื่อของคุณก่อน'); return; }
+      const x = await act(bb, 'bind', { seat, pin: $('#pin').value.trim() });
+      if (x && x.ok) { toast('เชื่อม LINE แล้ว'); renderScan(); }
+    };
+    return;
+  }
+  const rq = c.req || {};
+  let h = '';
+  if (c.status === 'used') h += '<div class="banner b-red">❌ คูปองนี้ใช้สิทธิ์ไปแล้ว<div style="font-weight:500;font-size:14px;margin-top:4px">เมื่อ '+ft(c.usedAt)+' โดย '+esc(c.usedByName)+'</div></div>';
+  else if (c.status !== 'requested') h += '<div class="banner b-grey">นายทุนยังไม่ได้กดใช้สิทธิ์ หรือยกเลิกคำขอแล้ว</div>';
+  else if (!r.tokenOk) h += '<div class="banner b-red">QR นี้เป็นรุ่นเก่า ให้นายทุนเปิด QR ล่าสุด</div>';
+  else h += '<div class="banner b-blue">ตรวจรายละเอียดให้ตรงกับเคสที่ทำวันนี้</div>';
+  h += '<div class="card"><dl class="kv"><dt>นายทุน</dt><dd>'+esc(c.investorName)+'</dd><dt>คูปอง</dt><dd>'+esc(c.code)+'</dd>'+
+    '<dt>ส่วนลด</dt><dd>'+esc(c.tierLabel.replace(' INVESTOR',''))+' · '+baht(c.amount)+' บาท</dd>'+
+    (rq.caseCode ? '<dt>เคส</dt><dd>'+esc(rq.caseCode)+'</dd><dt>ผู้มาทำ</dt><dd>'+(rq.mode==='poa'?'ผู้รับมอบอำนาจ: '+esc(rq.proxyName):'นายทุนมาเอง')+'</dd>' : '')+
+    '<dt>ใช้ได้ถึง</dt><dd>'+fd(c.expiresAt)+'</dd></dl></div>';
+  if (c.status === 'requested' && r.tokenOk) {
+    if (r.canConfirm) h += '<div class="card" style="display:flex;flex-direction:column;gap:12px"><div><label class="f" for="sCase">รหัสเคสที่ทำนิติกรรมวันนี้</label><input id="sCase" placeholder="เช่น 265208"></div>'+
+      '<div><span style="font-size:15px;font-weight:700;display:block;margin-bottom:6px">ผู้มาทำนิติกรรม</span><div class="seg"><button id="sSelf" aria-pressed="true">นายทุนมาเอง</button><button id="sPoa" aria-pressed="false">ผู้รับมอบอำนาจ</button></div></div>'+
+      '<div id="sProxyWrap" hidden><label class="f" for="sProxy">ชื่อผู้รับมอบอำนาจ</label><input id="sProxy" placeholder="ชื่อ-นามสกุล"></div></div>'+
+      '<div class="sub">กดหลังทำนิติกรรมเคสนี้เสร็จแล้วเท่านั้น</div><button class="btn green" id="confirmBtn">ยืนยันสิทธิ์</button>';
+    else h += '<div class="card sub">คุณดูได้อย่างเดียว ปุ่มยืนยันสิทธิ์ใช้ได้เฉพาะเจ้าหน้าที่นิติกรรม</div>';
+  }
+  if (c.scans && c.scans.length) h += '<div class="card"><b style="font-size:14px">ประวัติการสแกน</b><div class="logl" style="margin-top:8px">'+c.scans.map(s=>'<div>'+ft(s.at)+' · '+esc(s.name)+' ('+esc(RL(s.role))+')</div>').join('')+'</div></div>';
+  b.innerHTML = h; show('scan');
+  const btn = $('#confirmBtn');
+  let smode = 'self';
+  if (btn) {
+    $('#sSelf').onclick = () => { smode = 'self'; $('#sSelf').setAttribute('aria-pressed','true'); $('#sPoa').setAttribute('aria-pressed','false'); $('#sProxyWrap').hidden = true; };
+    $('#sPoa').onclick = () => { smode = 'poa'; $('#sPoa').setAttribute('aria-pressed','true'); $('#sSelf').setAttribute('aria-pressed','false'); $('#sProxyWrap').hidden = false; };
+  }
+  if (btn) btn.onclick = async () => {
+    const data = { code, t, caseCode: $('#sCase').value.trim(), mode: smode, proxyName: ($('#sProxy').value || '').trim() };
+    if (!data.caseCode) { toast('กรอกรหัสเคส'); return; }
+    if (smode === 'poa' && !data.proxyName) { toast('กรอกชื่อผู้รับมอบอำนาจ'); return; }
+    const x = await act(btn, 'confirm', data);
+    if (x && x.ok) { b.innerHTML = receipt(x.coupon, 'ยืนยันสิทธิ์สำเร็จ'); window.scrollTo(0,0); }
+    else if (x && x.coupon) renderScan();
+  };
+}
+
+/* ---------- นิติกรรม: ลงทะเบียน ---------- */
+function renderRegister(){
+  const s = ME.staff, b = $('#regBody');
+  b.innerHTML = s ? '<div class="banner b-green">✅ LINE นี้เชื่อมเป็นเจ้าหน้าที่นิติกรรมแล้ว<div style="font-weight:500;font-size:14px;margin-top:4px">'+esc(s.name)+'</div></div>'
+    : '<div class="card sub">สแกน QR คูปองของนายทุนด้วยกล้อง LINE ครั้งแรก ระบบจะให้เลือกชื่อและใส่รหัส 4 หลักเพื่อเชื่อม LINE</div>';
+  show('register');
+}
+
+/* ---------- ผู้ดูแล ---------- */
+async function renderAdmin(){
+  const r = await api('admin'); const b = $('#adminBody');
+  if (!r.ok) { b.innerHTML = '<div class="banner b-red">'+esc(r.msg)+'</div>'; show('admin'); return; }
+  b.innerHTML =
+    '<div class="card" style="display:flex;flex-direction:column;gap:10px"><b>ส่งกล่องของขวัญทดสอบเข้า LINE ตัวเอง</b>'+
+      '<input id="iName" value="'+esc(ME.name)+'" aria-label="ชื่อนายทุน"><select id="iTier" aria-label="ระดับ"><option value="gold">GOLD · 5,000</option><option value="platinum">PLATINUM · 7,000</option><option value="diamond" selected>DIAMOND · 10,000</option></select>'+
+      '<button class="btn" id="issueBtn">ส่งกล่องของขวัญ</button></div>'+
+    '<div class="card"><b>เจ้าหน้าที่นิติกรรม (ล็อกไว้ '+r.seats.length+' คน)</b><div class="sub" style="margin-top:2px">ให้รหัสแต่ละคนทางส่วนตัว ใช้ครั้งเดียวตอนสแกน QR ครั้งแรก</div>'+
+      r.seats.map(s => '<div style="margin-top:12px;padding-top:10px;border-top:1px solid #E5E7EB"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><b>'+esc(s.name)+'</b><span>รหัส <b style="font-size:17px;letter-spacing:2px">'+esc(s.pin)+'</b></span></div>'+
+        '<div class="sub">เชื่อมแล้ว '+s.lines.length+'/'+s.max+' LINE</div>'+
+        s.lines.map(l => '<div style="display:flex;gap:8px;align-items:center;margin-top:6px"><span style="flex:1">LINE: '+esc(l.lineName)+' <span class="sub">· '+ft(l.at)+'</span></span><button class="btn alt" style="width:auto;min-height:36px;font-size:13px" data-unbind="'+l.id+'">ปลด</button></div>').join('')+
+        '<button class="link" style="align-self:flex-start;padding:0" data-newpin="'+s.key+'">ออกรหัสใหม่</button></div>').join('')+'</div>'+
+    '<div class="card"><b>คูปองทั้งหมด ('+r.coupons.length+')</b>'+r.coupons.map(c => '<div style="margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap"><div style="flex:1;min-width:160px"><b>'+esc(c.code)+'</b> · '+esc(c.investorName)+'<div class="sub">'+esc(c.tierLabel.replace(' INVESTOR',''))+' · <span class="st st-'+c.status+'">'+ST[c.status]+'</span>'+(c.usedByName?' · ยืนยันโดย '+esc(c.usedByName):'')+'</div></div>'+(c.status==='used'?'<button class="btn alt" style="width:auto;min-height:40px" data-undo="'+esc(c.code)+'">ยกเลิกการใช้สิทธิ์</button>':'')+'</div>').join('')+'</div>'+
+    '<div class="card"><b>ประวัติ</b><div class="logl" style="margin-top:8px">'+r.log.map(l => '<div>'+ft(l.at)+' · '+esc(l.byName)+' ('+esc(RL(l.role))+')<br>'+esc(l.what)+(l.code?' · '+esc(l.code):'')+'</div>').join('')+'</div></div>'+
+    '<button class="btn alt" id="resetBtn">ล้างข้อมูลทดสอบ (ลบคูปองทั้งหมด)</button>';
+  $('#issueBtn').onclick = async () => { const x = await act($('#issueBtn'), 'issue', { tier: $('#iTier').value, name: $('#iName').value }); if (x && x.ok) { toast('ส่งกล่องของขวัญแล้ว ปิดหน้านี้แล้วดูแชท Test Nan'); renderAdmin(); } };
+  b.querySelectorAll('[data-unbind]').forEach(x => x.onclick = async () => {
+    if (x.dataset.armed !== '1') { x.dataset.armed = '1'; x.textContent = 'ยืนยันปลด'; return; }
+    const y = await act(x, 'unbind', { uid: x.dataset.unbind }); if (y && y.ok) renderAdmin(); });
+  b.querySelectorAll('[data-newpin]').forEach(x => x.onclick = async () => { const y = await act(x, 'newPin', { seat: x.dataset.newpin }); if (y && y.ok) { toast('ออกรหัสใหม่แล้ว'); renderAdmin(); } });
+  b.querySelectorAll('[data-undo]').forEach(x => x.onclick = async () => {
+    if (x.dataset.armed !== '1') { x.dataset.armed = '1'; x.textContent = 'แตะอีกครั้งเพื่อยืนยัน'; return; }
+    const y = await act(x, 'undo', { code: x.dataset.undo, reason: 'ทดสอบยกเลิกโดยผู้ดูแล' }); if (y && y.ok) renderAdmin(); });
+  const rb = $('#resetBtn');
+  rb.onclick = async () => { if (rb.dataset.armed !== '1') { rb.dataset.armed='1'; rb.textContent='แตะอีกครั้งเพื่อลบคูปองทดสอบทั้งหมด'; return; } const y = await act(rb, 'reset'); if (y && y.ok) { toast('ล้างแล้ว'); renderAdmin(); } };
+  show('admin');
+}
+
+async function start(){
+  try {
+    if (!DEMO) {
+      await liff.init({ liffId: LIFF_ID });
+      qs = readQs();
+      if (!liff.isLoggedIn()) { liff.login({ redirectUri: location.href }); return; }
+      if (qs.get('demo') === '1' || qs.get('tier')) {
+        LOCAL.on = true; LOCAL.load();
+        const pr = await liff.getProfile();
+        LOCAL.me = { id: pr.userId, name: pr.displayName };
+        if (qs.get('view') !== 'scan') LOCAL.ensureCoupon();
+      } else if (!liff.getIDToken()) { fatal('แอปนี้ยังไม่ได้เปิดสิทธิ์ openid ใน LINE Developers (LIFF scope)'); return; }
+    }
+    const view = qs.get('view') || 'wallet';
+    if (view === 'scan') { await renderScan(); return; }
+    await reloadMe();
+    if (view === 'register') { renderRegister(); return; }
+    if (view === 'admin') { await renderAdmin(); return; }
+    const code = qs.get('c');
+    if (code && COUPONS.find(c => c.code === code)) { openCoupon(code); return; }
+    const pending = COUPONS.find(c => c.status === 'issued');
+    if ((view === 'gift' || LOCAL.on) && pending) { CUR = pending; theme(CUR.tier); openGiftScreen(); return; }
+    renderWallet(); show('wallet');
+  } catch (e) { console.error(e); fatal('เชื่อมต่อไม่สำเร็จ: ' + e.message); }
 }
 start();
 </script>
